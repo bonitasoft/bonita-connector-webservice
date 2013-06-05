@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition:ConnectorDefinition xmlns:definition="http://www.bonitasoft.org/ns/connector/definition/6.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<id>webservice</id>
+	<version>1.0.0</version>
+	<icon>ws.png</icon>
+
+	<category id="webservices" icon="ws.png" />
+
+	<input name="serviceNS" type="java.lang.String" mandatory="true" />
+	<input name="serviceName" type="java.lang.String" mandatory="true" />
+	<input name="portName" type="java.lang.String" mandatory="true" />
+	<input name="envelope" type="java.lang.String" mandatory="true" />
+	<input name="endpointAddress" type="java.lang.String" mandatory="true" />
+	<input name="binding" type="java.lang.String" mandatory="true" />
+	<input name="soapAction" type="java.lang.String" />
+	<input name="userName" type="java.lang.String" />
+	<input name="password" type="java.lang.String" />
+	<input name="buildResponseDocumentEnvelope" type="java.lang.Boolean" />
+	<input name="buildResponseDocumentBody" type="java.lang.Boolean" />
+	<input name="printRequestAndResponse" type="java.lang.Boolean" />
+	<input name="httpHeaders" type="java.util.Map" />
+	
+	<output name="responseDocumentEnvelope" type="org.w3c.dom.Document" />
+	<output name="responseDocumentBody" type="org.w3c.dom.Document" />
+	<output name="sourceResponse" type="javax.xml.transform.Source" />
+
+	<page id="connection_information">
+		<widget id="userName" inputName="userName" xsi:type="definition:Text" />
+		<widget id="password" inputName="password" xsi:type="definition:Password" />
+
+        <!-- service name -->
+		<widget id="serviceNS" inputName="serviceNS" xsi:type="definition:Text" />
+		<widget id="serviceName" inputName="serviceName" xsi:type="definition:Text" />
+    </page>
+
+
+    <!-- Endpoint to connect to -->
+    <page id="request_configuration">
+        <widget id="soapAction" inputName="soapAction" xsi:type="definition:Text" /> <!-- action related to the request -->
+        <widget id="portName" inputName="portName" xsi:type="definition:Text" />
+        <widget id="endpointAddress" inputName="endpointAddress" xsi:type="definition:Text" /> <!-- port address -->
+        <widget id="binding" inputName="binding" xsi:type="definition:Text" /> <!-- message format -->
+
+        <widget id="envelope" inputName="envelope" xsi:type="definition:TextArea" />
+    </page>
+
+    <page id="request_headers">
+        <widget id="httpHeaders" inputName="httpHeaders" xsi:type="definition:Array" cols="2" rows="-1" fixedCols="true" fixedRows="false">
+            <colsCaption>Name</colsCaption>
+            <colsCaption>Value</colsCaption>
+        </widget>
+    </page>
+
+    <page id="response_configuration">
+        <!-- response properties -->
+        <widget id="buildResponseDocumentEnvelope" inputName="buildResponseDocumentEnvelope" xsi:type="definition:Checkbox" />
+        <widget id="buildResponseDocumentBody" inputName="buildResponseDocumentBody" xsi:type="definition:Checkbox" />
+        <widget id="printRequestAndResponse" inputName="printRequestAndResponse" xsi:type="definition:Checkbox" />
+    </page>
+
+</definition:ConnectorDefinition>
