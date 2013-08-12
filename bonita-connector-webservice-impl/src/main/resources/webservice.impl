@@ -4,7 +4,7 @@
 	<definitionId>webservice</definitionId>
     <description>SOAP implementation based on apache-cxf 2.4.0</description>
 	<definitionVersion>1.0.0</definitionVersion>
-	<implementationClassname>org.bonitasoft.connectors.ws.org.bonitasoft.connectors.webservice.SecureWSConnector</implementationClassname>
+	<implementationClassname>org.bonitasoft.connectors.ws.cxf.SecureWSConnector</implementationClassname>
 	<implementationId>webservice-impl</implementationId>
 	<implementationVersion>1.0.11</implementationVersion>
 
