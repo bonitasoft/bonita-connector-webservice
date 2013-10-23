@@ -8,7 +8,7 @@
 	</parent>
 
 	<artifactId>bonita-connector-webservice</artifactId>
-	<version>6.1.0-rc-09</version>
+	<version>6.1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<modules>
@@ -33,7 +33,7 @@
         <developerConnection>scm:git:git@github.com:bonitasoft/bonita-connector-webservice.git</developerConnection>
         <connection>scm:git:git@github.com:bonitasoft/bonita-connector-webservice.git</connection>
         <url>https://github.com/bonitasoft/bonita-connector-webservice</url>
-        <tag>bonita-connector-webservice-6.1.0-rc-09</tag>
+        <tag>HEAD</tag>
     </scm>
 
 </project>
