@@ -69,7 +69,7 @@ public class SecureWSConnectorTest {
     }
 
     @Cover(classes = { SecureWSConnector.class }, concept = BPMNConcept.CONNECTOR, keywords = { "webservice" },
-            story = "Test Customer web service.")
+            story = "Test Customer web service.",jira = "")
     @Test
     public void testCustomer() throws Exception {
         final StringBuilder request = new StringBuilder("");
@@ -93,7 +93,7 @@ public class SecureWSConnectorTest {
     }
 
     @Cover(classes = { SecureWSConnector.class }, concept = BPMNConcept.CONNECTOR, keywords = { "webservice" },
-            story = "Test basic http authentication.")
+            story = "Test basic http authentication.",jira = "")
     @Test
     public void testBasicHTTPAuth() throws Exception {
 
@@ -114,7 +114,7 @@ public class SecureWSConnectorTest {
     }
 
     @Cover(classes = { SecureWSConnector.class }, concept = BPMNConcept.CONNECTOR, keywords = { "webservice", "HTTP header" },
-            story = "Check that everything's fine when the header is correct.")
+            story = "Check that everything's fine when the header is correct.",jira = "")
     @Test
     public void testHTTPHeaderOK() throws Exception {
 
@@ -141,7 +141,7 @@ public class SecureWSConnectorTest {
     }
 
     @Cover(classes = { SecureWSConnector.class }, concept = BPMNConcept.CONNECTOR, keywords = { "webservice", "HTTP header" },
-            story = "Check that everything's fine when the header is correct.")
+            story = "Check that everything's fine when the header is correct.",jira = "")
     @Test
     public void testHTTPHeaderOK2() throws Exception {
         final StringBuilder request = new StringBuilder("");
@@ -165,7 +165,7 @@ public class SecureWSConnectorTest {
     }
 
     @Cover(classes = { SecureWSConnector.class }, concept = BPMNConcept.CONNECTOR, keywords = { "webservice", "HTTP header" },
-            story = "Get a ConnectorException when HTTP header is wrong.")
+            story = "Get a ConnectorException when HTTP header is wrong.",jira = "")
     @Test(expected = ConnectorException.class)
     public void testHTTPHeaderKO() throws Exception {
 
@@ -194,7 +194,7 @@ public class SecureWSConnectorTest {
     }
 
     @Cover(classes = { SecureWSConnector.class }, concept = BPMNConcept.CONNECTOR, keywords = { "webservice", "timeout" },
-            story = "Check read timeout work.")
+            story = "Check read timeout work.",jira = "")
     @Test
     public void testReadTimeoutOK() throws Exception {
 
