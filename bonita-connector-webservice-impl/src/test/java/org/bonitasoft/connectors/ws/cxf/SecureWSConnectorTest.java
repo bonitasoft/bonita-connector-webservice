@@ -21,8 +21,6 @@ import javax.xml.ws.soap.SOAPBinding;
 
 import junit.framework.Assert;
 import org.bonitasoft.engine.connector.ConnectorException;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -68,8 +66,6 @@ public class SecureWSConnectorTest {
         server.stop();
     }
 
-    @Cover(classes = { SecureWSConnector.class }, concept = BPMNConcept.CONNECTOR, keywords = { "webservice" },
-            story = "Test Customer web service.")
     @Test
     public void testCustomer() throws Exception {
         final StringBuilder request = new StringBuilder("");
@@ -92,8 +88,6 @@ public class SecureWSConnectorTest {
 
     }
 
-    @Cover(classes = { SecureWSConnector.class }, concept = BPMNConcept.CONNECTOR, keywords = { "webservice" },
-            story = "Test basic http authentication.")
     @Test
     public void testBasicHTTPAuth() throws Exception {
 
@@ -113,8 +107,6 @@ public class SecureWSConnectorTest {
 
     }
 
-    @Cover(classes = { SecureWSConnector.class }, concept = BPMNConcept.CONNECTOR, keywords = { "webservice", "HTTP header" },
-            story = "Check that everything's fine when the header is correct.")
     @Test
     public void testHTTPHeaderOK() throws Exception {
 
@@ -140,8 +132,6 @@ public class SecureWSConnectorTest {
                 "http://hello.cxf.ws.connectors.bonitasoft.org/", null, "guest", "guest", requestHeaders);
     }
 
-    @Cover(classes = { SecureWSConnector.class }, concept = BPMNConcept.CONNECTOR, keywords = { "webservice", "HTTP header" },
-            story = "Check that everything's fine when the header is correct.")
     @Test
     public void testHTTPHeaderOK2() throws Exception {
         final StringBuilder request = new StringBuilder("");
@@ -164,8 +154,6 @@ public class SecureWSConnectorTest {
                 "http://hello.cxf.ws.connectors.bonitasoft.org/", null, "guest", "guest", requestHeaders);
     }
 
-    @Cover(classes = { SecureWSConnector.class }, concept = BPMNConcept.CONNECTOR, keywords = { "webservice", "HTTP header" },
-            story = "Get a ConnectorException when HTTP header is wrong.")
     @Test(expected = ConnectorException.class)
     public void testHTTPHeaderKO() throws Exception {
 
@@ -193,8 +181,6 @@ public class SecureWSConnectorTest {
 
     }
 
-    @Cover(classes = { SecureWSConnector.class }, concept = BPMNConcept.CONNECTOR, keywords = { "webservice", "timeout" },
-            story = "Check read timeout work.")
     @Test
     public void testReadTimeoutOK() throws Exception {
 
