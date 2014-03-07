@@ -6,7 +6,7 @@
 	<definitionVersion>1.0.0</definitionVersion>
 	<implementationClassname>org.bonitasoft.connectors.ws.cxf.SecureWSConnector</implementationClassname>
 	<implementationId>webservice-impl</implementationId>
-	<implementationVersion>1.0.11</implementationVersion>
+	<implementationVersion>$implementation.version$</implementationVersion>
 
 $Dependencies$
 </implementation:connectorImplementation>
