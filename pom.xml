@@ -9,6 +9,7 @@
 	</parent>
 
 	<artifactId>bonita-connector-webservice</artifactId>
+	<version>1.0.0</version>
 	<packaging>pom</packaging>
 
 	<modules>

@@ -11,7 +11,7 @@
 	<version>1.0.11</version>
 	
 	<properties>
-		<implementation.id>webservice</implementation.id>
+		<definition.version>1.0.0</definition.version>
 		<cxf.version>2.4.0</cxf.version>
 	</properties>
 
@@ -19,7 +19,7 @@
 		<dependency>
 			<artifactId>bonita-connector-webservice-def</artifactId>
 			<groupId>org.bonitasoft.connectors</groupId>
-			<version>1.0.0</version>
+			<version>${definition.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
