@@ -16,6 +16,7 @@ package org.bonitasoft.connectors.ws.cxf;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,7 +87,7 @@ public class SecureWSConnector extends AbstractConnector {
 
     private static final String HTTP_HEADERS = "httpHeaders";
 
-    private Logger LOGGER = Logger.getLogger(this.getClass().getName());
+    private final Logger LOGGER = Logger.getLogger(this.getClass().getName());
 
     private Transformer transformer;
 
@@ -160,11 +161,19 @@ public class SecureWSConnector extends AbstractConnector {
         if (httpHeadersList != null) {
             final Map<String, List<String>> httpHeadersMap = new HashMap<String, List<String>>();
             for (final List<Object> row : httpHeadersList) {
-                final List<String> parameters = new ArrayList<String>();
-                for (final Object parameter : (List<Object>) row.get(1)) {
-                    parameters.add(parameter.toString());
+                if (row.size() == 2) {
+                    final List<String> parameters = new ArrayList<String>();
+                    final Object value = row.get(1);
+                    if (value instanceof Collection) {
+                        for (final Object parameter : (Collection<Object>) value) {
+                            parameters.add(parameter.toString());
+                        }
+                    } else {
+                        parameters.add(value.toString());
+                    }
+                    httpHeadersMap.put((String) row.get(0), parameters);
+
                 }
-                httpHeadersMap.put((String) row.get(0), parameters);
             }
             dispatch.getRequestContext().put(MessageContext.HTTP_REQUEST_HEADERS, httpHeadersMap);
         }
@@ -174,7 +183,7 @@ public class SecureWSConnector extends AbstractConnector {
         final Source sourceResponse;
         try {
             sourceResponse = dispatch.invoke(new StreamSource(new StringReader(envelope)));
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new ConnectorException("Exception trying to call remote webservice", e);
         }
         Boolean buildResponseDocumentEnveloppe = (Boolean) getInputParameter(BUILD_RESPONSE_DOCUMENT_ENVELOPE);
