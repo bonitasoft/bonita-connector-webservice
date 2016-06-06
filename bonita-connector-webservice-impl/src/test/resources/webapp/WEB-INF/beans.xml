@@ -31,22 +31,22 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
 
 	<jaxws:endpoint 
 	  id="helloWorld" 
-	  implementor="org.bonitasoft.connectors.ws.cxf.hello.HelloWorldImpl" 
+	  implementor="org.bonitasoft.connectors.ws.hello.HelloWorldImpl" 
 	  address="/HelloWorld" />
 	
 	<jaxws:endpoint 
     id="customer" 
-    implementor="org.bonitasoft.connectors.ws.cxf.customer.ManageCustomerOrderInternalImpl" 
+    implementor="org.bonitasoft.connectors.ws.customer.ManageCustomerOrderInternalImpl" 
     address="/Customer" />
     
     	<jaxws:endpoint 
 	  id="helloTimeout" 
-	  implementor="org.bonitasoft.connectors.ws.cxf.helloTimeout.HelloTimeoutImpl" 
+	  implementor="org.bonitasoft.connectors.ws.helloTimeout.HelloTimeoutImpl" 
 	  address="/HelloTimeout" />
 	  
 	  <jaxws:endpoint 
 	  id="helloHeader" 
-	  implementor="org.bonitasoft.connectors.ws.cxf.helloHeader.HelloHeaderImpl" 
+	  implementor="org.bonitasoft.connectors.ws.helloHeader.HelloHeaderImpl" 
 	  address="/HelloHeader" />
       
 </beans>

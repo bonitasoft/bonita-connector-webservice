@@ -14,7 +14,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.bonitasoft.connectors.ws.cxf;
+package org.bonitasoft.connectors.ws;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -55,7 +55,7 @@ public class Server {
 
         server.setHandler(handlers);
 
-        final HashUserRealm myrealm = new HashUserRealm("MyRealm", "src/test/resources/org/bonitasoft/connectors/ws/cxf/realm.properties");
+        final HashUserRealm myrealm = new HashUserRealm("MyRealm", "src/test/resources/org/bonitasoft/connectors/ws/realm.properties");
         server.setUserRealms(new UserRealm[] { myrealm });
 
         thread = new ServerThread(server);

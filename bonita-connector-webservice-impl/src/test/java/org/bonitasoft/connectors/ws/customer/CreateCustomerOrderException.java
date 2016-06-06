@@ -1,4 +1,4 @@
-package org.bonitasoft.connectors.ws.cxf.customer;
+package org.bonitasoft.connectors.ws.customer;
 
 public class CreateCustomerOrderException extends Exception {
 

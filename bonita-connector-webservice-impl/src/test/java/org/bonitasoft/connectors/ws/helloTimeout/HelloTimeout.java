@@ -17,12 +17,12 @@
  * under the License.
  */
 // START SNIPPET: service
-package org.bonitasoft.connectors.ws.cxf.hello;
+package org.bonitasoft.connectors.ws.helloTimeout;
 
 import javax.jws.WebService;
 
 @WebService
-public interface HelloWorld {
+public interface HelloTimeout {
     String sayHi(String text);
 }
 // END SNIPPET: service

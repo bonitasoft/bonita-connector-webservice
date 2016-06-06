@@ -1,4 +1,4 @@
-package org.bonitasoft.connectors.ws.cxf;
+package org.bonitasoft.connectors.ws;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -19,7 +19,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.ws.soap.SOAPBinding;
 
-import junit.framework.Assert;
+import org.bonitasoft.connectors.ws.SecureWSConnector;
 import org.bonitasoft.engine.connector.ConnectorException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -28,6 +28,8 @@ import org.junit.Test;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
+
+import junit.framework.Assert;
 
 public class SecureWSConnectorTest {
 
@@ -198,7 +200,7 @@ public class SecureWSConnectorTest {
         request.append(" </soapenv:Body>");
         request.append("</soapenv:Envelope>");
 
-        List<String> timeoutList = Collections.singletonList(String.valueOf(timeout));
+        final List<String> timeoutList = Collections.singletonList(String.valueOf(timeout));
         final Map<String, List<String>> requestHeaders = Collections.singletonMap("com.sun.xml.ws.request.timeout", timeoutList);
 
         execute(request.toString(), SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloTimeout", "HelloWorldImplService", "HelloWorldImplPort",
@@ -239,8 +241,8 @@ public class SecureWSConnectorTest {
 
         if (requestHeaders != null) {
             final List<List<Object>> requestHeadersList = new ArrayList<List<Object>>();
-            for (String key : requestHeaders.keySet()) {
-                List<Object> row = new ArrayList<Object>();
+            for (final String key : requestHeaders.keySet()) {
+                final List<Object> row = new ArrayList<Object>();
                 row.add(key);
                 row.add(requestHeaders.get(key));
                 requestHeadersList.add(row);

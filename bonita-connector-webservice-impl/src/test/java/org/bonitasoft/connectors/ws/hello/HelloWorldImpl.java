@@ -17,37 +17,17 @@
  * under the License.
  */
 // START SNIPPET: service
-package org.bonitasoft.connectors.ws.cxf.helloTimeout;
+package org.bonitasoft.connectors.ws.hello;
 
 import javax.jws.WebService;
 
-@WebService(endpointInterface = "org.bonitasoft.connectors.ws.cxf.helloTimeout.HelloTimeout")
-public class HelloTimeoutImpl implements HelloTimeout {
+@WebService(endpointInterface = "org.bonitasoft.connectors.ws.hello.HelloWorld")
+public class HelloWorldImpl implements HelloWorld {
 
-	
-	
-	 public String sayHi(String text) {
-	        System.out.println("sayHi called");
-	        
-	        Long timeToWait = Long.parseLong(text);
-	        
-	        waiting(timeToWait.intValue());
-	        
-	        return "Hello Timeout";
-	    }
-	 
-	 
-	 public static void waiting (int n){
-	        
-	        long t0, t1;
-	        System.out.println("Waiting : " + n + "milliseconds"); 
-	        t0 =  System.currentTimeMillis();
-
-	        do{
-	            t1 = System.currentTimeMillis();
-	        }
-	        while (t1 - t0 < n);
-	    }
-  
+    @Override
+    public String sayHi(String text) {
+        System.out.println("sayHi called");
+        return "Hello " + text;
+    }
 }
 // END SNIPPET: service

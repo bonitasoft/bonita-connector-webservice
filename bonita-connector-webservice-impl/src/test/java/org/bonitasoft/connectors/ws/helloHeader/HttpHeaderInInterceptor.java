@@ -1,4 +1,4 @@
-package org.bonitasoft.connectors.ws.cxf.helloHeader;
+package org.bonitasoft.connectors.ws.helloHeader;
 
 import java.util.List;
 import java.util.Map;

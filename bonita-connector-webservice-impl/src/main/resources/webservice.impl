@@ -2,9 +2,9 @@
 <implementation:connectorImplementation xmlns:implementation="http://www.bonitasoft.org/ns/connector/implementation/6.0">
 
 	<definitionId>webservice</definitionId>
-    <description>SOAP implementation based on apache-cxf 2.4.0</description>
+    <description>SOAP implementation based on javax</description>
 	<definitionVersion>$definition.version$</definitionVersion>
-	<implementationClassname>org.bonitasoft.connectors.ws.cxf.SecureWSConnector</implementationClassname>
+	<implementationClassname>org.bonitasoft.connectors.ws.SecureWSConnector</implementationClassname>
 	<implementationId>webservice-impl</implementationId>
 	<implementationVersion>$implementation.version$</implementationVersion>
 

@@ -1,4 +1,4 @@
-package org.bonitasoft.connectors.ws.cxf.customer;
+package org.bonitasoft.connectors.ws.customer;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;

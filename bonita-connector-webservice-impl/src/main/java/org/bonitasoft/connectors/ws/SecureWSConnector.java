@@ -12,14 +12,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.bonitasoft.connectors.ws.cxf;
+package org.bonitasoft.connectors.ws;
 
 import java.io.StringReader;
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -55,6 +58,8 @@ import org.w3c.dom.NodeList;
  */
 public class SecureWSConnector extends AbstractConnector {
 
+    private static final String SOCKS = "SOCKS";
+
     private static final String OUTPUT_RESPONSE_DOCUMENT_BODY = "responseDocumentBody";
 
     private static final String OUTPUT_RESPONSE_DOCUMENT_ENVELOPE = "responseDocumentEnvelope";
@@ -87,9 +92,21 @@ public class SecureWSConnector extends AbstractConnector {
 
     private static final String HTTP_HEADERS = "httpHeaders";
 
+    private static final String PROXY_HOST = "proxyHost";
+
+    private static final String PROXY_PORT = "proxyPort";
+
+    private static final String PROXY_PROTOCOL = "proxyProtocol";
+
+    private static final String PROXY_USER = "proxyUser";
+
+    private static final String PROXY_PASSWORD = "proxyPassword";
+
     private final Logger LOGGER = Logger.getLogger(this.getClass().getName());
 
     private Transformer transformer;
+
+    private Map<String, String> saveProxyConfiguration = new HashMap<String, String>();
 
     @Override
     public void validateInputParameters() throws ConnectorValidationException {
@@ -122,6 +139,8 @@ public class SecureWSConnector extends AbstractConnector {
     @SuppressWarnings("unchecked")
     @Override
     protected void executeBusinessLogic() throws ConnectorException {
+        configureProxy();
+
         final String serviceNS = (String) getInputParameter(SERVICE_NS);
         LOGGER.info(SERVICE_NS + " " + serviceNS);
         final String serviceName = (String) getInputParameter(SERVICE_NAME);
@@ -139,6 +158,7 @@ public class SecureWSConnector extends AbstractConnector {
         service.addPort(portQName, binding, endpointAddress);
 
         final Dispatch<Source> dispatch = service.createDispatch(portQName, Source.class, Service.Mode.MESSAGE);
+        dispatch.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endpointAddress);
         final Object authUserName = getInputParameter(USER_NAME);
         if (authUserName != null) {
             LOGGER.info(USER_NAME + " " + authUserName);
@@ -180,12 +200,18 @@ public class SecureWSConnector extends AbstractConnector {
 
         final String envelope = (String) getInputParameter(ENVELOPE);
         LOGGER.info(ENVELOPE + " " + envelope);
+
+
+
         final Source sourceResponse;
         try {
             sourceResponse = dispatch.invoke(new StreamSource(new StringReader(envelope)));
         } catch (final Exception e) {
             throw new ConnectorException("Exception trying to call remote webservice", e);
         }
+
+        restoreConfiguration();
+
         Boolean buildResponseDocumentEnveloppe = (Boolean) getInputParameter(BUILD_RESPONSE_DOCUMENT_ENVELOPE);
         LOGGER.info(BUILD_RESPONSE_DOCUMENT_ENVELOPE + " " + buildResponseDocumentEnveloppe);
         Boolean buildResponseDocumentBody = (Boolean) getInputParameter(BUILD_RESPONSE_DOCUMENT_BODY);
@@ -218,6 +244,71 @@ public class SecureWSConnector extends AbstractConnector {
         setOutputParameter(OUTPUT_SOURCE_RESPONSE, sourceResponse);
         setOutputParameter(OUTPUT_RESPONSE_DOCUMENT_ENVELOPE, responseDocumentEnvelope);
         setOutputParameter(OUTPUT_RESPONSE_DOCUMENT_BODY, responseDocumentBody);
+    }
+
+    private void restoreConfiguration() {
+        for (final Entry<String, String> entry : saveProxyConfiguration.entrySet()) {
+            if (entry.getValue() != null) {
+                System.setProperty(entry.getKey(), entry.getValue());
+            } else {
+                System.clearProperty(entry.getKey());
+            }
+        }
+        Authenticator.setDefault(null);
+    }
+
+    private void configureProxy() {
+        saveProxyConfiguration  = saveProxyConfiguration();
+        final String host = (String) getInputParameter(PROXY_HOST);
+        if (host == null || host.isEmpty()) {
+            return;
+        }
+        LOGGER.info(PROXY_HOST + " " + host);
+        final String protocol = (String) getInputParameter(PROXY_PROTOCOL);
+        LOGGER.info(PROXY_PROTOCOL + " " + protocol);
+        final String port = (String) getInputParameter(PROXY_PORT);
+        LOGGER.info(PROXY_PORT + " " + port);
+
+        if(SOCKS.equals(protocol)){
+            System.setProperty("socksProxyHost", host);
+            LOGGER.info("Setting environment variable: socksProxyHost=" + host);
+            System.setProperty("socksProxyPort", port);
+            LOGGER.info("Setting environment variable: socksProxyPort=" + port);
+        }else{
+            final String hostKey = String.format("%s.proxyHost", protocol.toLowerCase());
+            System.setProperty(hostKey, host);
+            LOGGER.info("Setting environment variable: " + hostKey + "=" + host);
+            final String portKey = String.format("%s.proxyPort", protocol.toLowerCase());
+            System.setProperty(portKey, port);
+            LOGGER.info("Setting environment variable: " + portKey + "=" + port);
+        }
+
+        final String user = (String) getInputParameter(PROXY_USER);
+        LOGGER.info(PROXY_USER + " " + user);
+        final String password = (String) getInputParameter(PROXY_PASSWORD);
+        LOGGER.info(PROXY_PASSWORD + " " + password);
+        if (user != null && !user.isEmpty()) {
+            Authenticator.setDefault(new Authenticator() {
+
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(user, password != null ? password.toCharArray() : "".toCharArray());
+                }
+
+            });
+        }
+
+    }
+
+    private Map<String, String> saveProxyConfiguration() {
+        final Map<String, String> configuration = new HashMap<String, String>();
+        configuration.put("http.proxyHost", System.getProperty("http.proxyHost"));
+        configuration.put("http.proxyPort", System.getProperty("http.proxyPort"));
+        configuration.put("https.proxyHost", System.getProperty("https.proxyHost"));
+        configuration.put("https.proxyPort", System.getProperty("https.proxyPort"));
+        configuration.put("socksProxyHost", System.getProperty("socksProxyHost"));
+        configuration.put("socksProxyPort", System.getProperty("socksProxyPort"));
+        return configuration;
     }
 
     private Document buildResponseDocumentEnveloppe(Source sourceResponse) throws ConnectorException {

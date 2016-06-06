@@ -17,16 +17,12 @@
  * under the License.
  */
 // START SNIPPET: service
-package org.bonitasoft.connectors.ws.cxf.hello;
+package org.bonitasoft.connectors.ws.hello;
 
 import javax.jws.WebService;
 
-@WebService(endpointInterface = "org.bonitasoft.connectors.ws.cxf.hello.HelloWorld")
-public class HelloWorldImpl implements HelloWorld {
-
-    public String sayHi(String text) {
-        System.out.println("sayHi called");
-        return "Hello " + text;
-    }
+@WebService
+public interface HelloWorld {
+    String sayHi(String text);
 }
 // END SNIPPET: service

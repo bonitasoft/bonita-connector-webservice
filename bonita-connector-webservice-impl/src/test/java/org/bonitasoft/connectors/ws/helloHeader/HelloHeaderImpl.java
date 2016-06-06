@@ -14,43 +14,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.bonitasoft.connectors.ws.cxf;
+// START SNIPPET: service
+package org.bonitasoft.connectors.ws.helloHeader;
 
-public class ServerThread extends Thread {
+import javax.jws.WebService;
 
-    private final org.mortbay.jetty.Server server;
-
-    private boolean startFailed = false;
-
-    public ServerThread(final org.mortbay.jetty.Server server) {
-        this.server = server;
-    }
+@org.apache.cxf.interceptor.InInterceptors(interceptors = { "org.bonitasoft.connectors.ws.helloHeader.HttpHeaderInInterceptor" })
+@WebService(endpointInterface = "org.bonitasoft.connectors.ws.helloHeader.HelloHeader")
+public class HelloHeaderImpl implements HelloHeader {
 
     @Override
-    public void run() {
-        try {
-            server.start();
-            System.out.println("Server ready...");
-            server.join();
-        } catch (final Exception e) {
-            startFailed = true;
-            e.printStackTrace();
-        }
+    public String sayHi(final String text) {
+        System.out.println("sayHi called");
+        return "Hello " + text;
     }
-
-    public void shutdown() throws Exception {
-        server.stop();
-    }
-
-    public boolean isServerStarted() {
-        return server.isStarted();
-    }
-
-    /**
-     * @return the startFailed
-     */
-    public boolean isStartFailed() {
-        return startFailed;
-    }
-
 }
+// END SNIPPET: service

@@ -8,10 +8,10 @@
 	</parent>
 
 	<artifactId>bonita-connector-webservice-impl</artifactId>
-	<version>1.0.13</version>
+	<version>1.0.14</version>
 	
 	<properties>
-		<definition.version>1.0.0</definition.version>
+		<definition.version>1.0.1</definition.version>
 		<cxf.version>2.4.0</cxf.version>
 	</properties>
 

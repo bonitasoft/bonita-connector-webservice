@@ -20,6 +20,14 @@
 	<input name="printRequestAndResponse" type="java.lang.Boolean" />
 	<input name="httpHeaders" type="java.util.Map" />
 	
+	<!-- Proxy settings -->
+	<input name="proxyProtocol" type="java.lang.String" />
+	<input name="proxyHost" type="java.lang.String" />
+	<input name="proxyPort" type="java.lang.String" />
+	<input name="proxyUser" type="java.lang.String" />
+	<input name="proxyPassword" type="java.lang.String" />
+	
+	
 	<output name="responseDocumentEnvelope" type="org.w3c.dom.Document" />
 	<output name="responseDocumentBody" type="org.w3c.dom.Document" />
 	<output name="sourceResponse" type="javax.xml.transform.Source" />
@@ -31,6 +39,20 @@
         <!-- service name -->
 		<widget id="serviceNS" inputName="serviceNS" xsi:type="definition:Text" />
 		<widget id="serviceName" inputName="serviceName" xsi:type="definition:Text" />
+		
+		 <!-- proxy settings -->
+		 <widget id="proxySettings" xsi:type="definition:Group">
+			<widget id="proxyProtocol" inputName="proxyProtocol" xsi:type="definition:Select">
+			  <items>HTTP</items>
+     		  <items>HTTPS</items>
+      		  <items>SOCKS</items>
+			 </widget>
+		 	<widget id="proxyHost" inputName="proxyHost" xsi:type="definition:Text" />
+			<widget id="proxyPort" inputName="proxyPort" xsi:type="definition:Text" />
+			<widget id="proxyUser" inputName="proxyUser" xsi:type="definition:Text" />
+			<widget id="proxyPassword" inputName="proxyPassword" xsi:type="definition:Password" />
+		 </widget>
+		
     </page>
 
 
