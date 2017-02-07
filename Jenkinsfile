@@ -13,11 +13,11 @@ properties([
 
 node {
 	
-	stage 'Checkout', {
+	stage '\u2776 Checkout', {
 	     checkout scm
 	}
 
-    stage '\u270A Build', {
+    stage '\u2777 Build', {
         try {
             def buildEnv =
             [
@@ -26,7 +26,6 @@ node {
             ]
             
             withEnv(buildEnv){
-                print "${MY_PARAM}"
                 sh "mvn clean verify"
             }
             
@@ -35,7 +34,7 @@ node {
         }
     }
 
-    stage 'Archive', {
+    stage '\u2778 Archive', {
         archive '**/target/*.zip'
     }
 }
