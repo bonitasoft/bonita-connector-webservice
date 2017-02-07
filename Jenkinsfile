@@ -17,7 +17,7 @@ node {
 	     checkout scm
 	}
 
-    stage 'Build', {
+    stage '\u270A Build', {
         try {
             def buildEnv =
             [
