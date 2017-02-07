@@ -26,7 +26,7 @@ node {
             ]
             
             withEnv(buildEnv){
-                print "$MY_PARAM"
+                print "${MY_PARAM}"
                 sh "mvn clean verify"
             }
             
