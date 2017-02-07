@@ -6,7 +6,7 @@ properties([
         [
             $class: 'ParametersDefinitionProperty',
             parameterDefinitions: [
-                [$class: 'StringParameterDefinition', defaultValue: '', description: 'Some Description', name : 'MY_PARAM']
+                [$class: 'StringParameterDefinition', defaultValue: 'sdafdsf', description: 'Some Description', name : 'MY_PARAM']
             ]
          ]
     ])
