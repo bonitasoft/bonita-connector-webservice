@@ -19,7 +19,6 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.ws.soap.SOAPBinding;
 
-import org.bonitasoft.connectors.ws.SecureWSConnector;
 import org.bonitasoft.engine.connector.ConnectorException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -72,7 +71,8 @@ public class SecureWSConnectorTest {
     public void testCustomer() throws Exception {
         final StringBuilder request = new StringBuilder("");
 
-        request.append("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:man=\"http://www.orangecaraibe.com/soa/v2/Interfaces/ManageCustomerOrderInternal\">");
+        request.append(
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:man=\"http://www.orangecaraibe.com/soa/v2/Interfaces/ManageCustomerOrderInternal\">");
         request.append("<soapenv:Header/>");
         request.append("<soapenv:Body>");
         request.append("  <man:executeStep>");
@@ -84,7 +84,8 @@ public class SecureWSConnectorTest {
         request.append("</soapenv:Envelope>");
 
         final String response = execute(request.toString(), SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/Customer",
-                "ManageCustomerOrderInternalImplService", "ManageCustomerOrderInternalImplPort", "http://hello.cxf.ws.connectors.bonitasoft.org/", null,
+                "ManageCustomerOrderInternalImplService", "ManageCustomerOrderInternalImplPort",
+                "http://hello.cxf.ws.connectors.bonitasoft.org/", null,
                 "guest", "guest");
         assertTrue(response, response.contains("false"));
 
@@ -94,7 +95,8 @@ public class SecureWSConnectorTest {
     public void testBasicHTTPAuth() throws Exception {
 
         final StringBuilder request = new StringBuilder("");
-        request.append("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">");
+        request.append(
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">");
         request.append(" <soapenv:Header/>");
         request.append(" <soapenv:Body>");
         request.append("    <spr:sayHi>");
@@ -103,7 +105,8 @@ public class SecureWSConnectorTest {
         request.append(" </soapenv:Body>");
         request.append("</soapenv:Envelope>");
 
-        final String response = execute(request.toString(), SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloWorld", "HelloWorldImplService",
+        final String response = execute(request.toString(), SOAPBinding.SOAP11HTTP_BINDING,
+                "http://localhost:9002/HelloWorld", "HelloWorldImplService",
                 "HelloWorldImplPort", "http://hello.cxf.ws.connectors.bonitasoft.org/", null, "guest", "guest");
         assertTrue(response, response.contains("Rodrigue test"));
 
@@ -113,7 +116,8 @@ public class SecureWSConnectorTest {
     public void testHTTPHeaderOK() throws Exception {
 
         final StringBuilder request = new StringBuilder("");
-        request.append("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">");
+        request.append(
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">");
         request.append(" <soapenv:Header/>");
         request.append(" <soapenv:Body>");
         request.append("    <spr:sayHi>");
@@ -125,19 +129,21 @@ public class SecureWSConnectorTest {
         final String headerName = "testName";
         final String headerValue = "testValue";
 
-        final Map<String, List<String>> requestHeaders = new HashMap<String, List<String>>();
-        final List<String> header = new ArrayList<String>();
+        final Map<String, List<String>> requestHeaders = new HashMap<>();
+        final List<String> header = new ArrayList<>();
         header.add(headerValue);
         requestHeaders.put(headerName, header);
 
-        execute(request.toString(), SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloHeader", "HelloHeaderImplService", "HelloWorldImplPort",
+        execute(request.toString(), SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloHeader",
+                "HelloHeaderImplService", "HelloWorldImplPort",
                 "http://hello.cxf.ws.connectors.bonitasoft.org/", null, "guest", "guest", requestHeaders);
     }
 
     @Test
     public void testHTTPHeaderOK2() throws Exception {
         final StringBuilder request = new StringBuilder("");
-        request.append("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">");
+        request.append(
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">");
         request.append(" <soapenv:Header/>");
         request.append(" <soapenv:Body>");
         request.append("    <spr:sayHi>");
@@ -147,12 +153,13 @@ public class SecureWSConnectorTest {
         request.append("</soapenv:Envelope>");
         final String headerName = "testName";
         final String headerValue = "testValue";
-        final List<String> header = new ArrayList<String>();
-        final Map<String, List<String>> requestHeaders = new HashMap<String, List<String>>();
+        final List<String> header = new ArrayList<>();
+        final Map<String, List<String>> requestHeaders = new HashMap<>();
         header.add(headerValue);
         requestHeaders.put(headerName, header);
 
-        execute(request.toString(), SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloHeader", "HelloHeaderImplService", "HelloWorldImplPort",
+        execute(request.toString(), SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloHeader",
+                "HelloHeaderImplService", "HelloWorldImplPort",
                 "http://hello.cxf.ws.connectors.bonitasoft.org/", null, "guest", "guest", requestHeaders);
     }
 
@@ -160,7 +167,8 @@ public class SecureWSConnectorTest {
     public void testHTTPHeaderKO() throws Exception {
 
         final StringBuilder request = new StringBuilder("");
-        request.append("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">");
+        request.append(
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">");
         request.append(" <soapenv:Header/>");
         request.append(" <soapenv:Body>");
         request.append("    <spr:sayHi>");
@@ -172,12 +180,13 @@ public class SecureWSConnectorTest {
         final String headerName = "testName";
         final String headerValue = "testValue2";
 
-        final Map<String, List<String>> requestHeaders = new HashMap<String, List<String>>();
-        final List<String> header = new ArrayList<String>();
+        final Map<String, List<String>> requestHeaders = new HashMap<>();
+        final List<String> header = new ArrayList<>();
         header.add(headerValue);
         requestHeaders.put(headerName, header);
 
-        execute(request.toString(), SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloHeader", "HelloHeaderImplService", "HelloWorldImplPort",
+        execute(request.toString(), SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloHeader",
+                "HelloHeaderImplService", "HelloWorldImplPort",
                 "http://hello.cxf.ws.connectors.bonitasoft.org/", null, "guest", "guest", requestHeaders);
         Assert.fail("This call should fail...");
 
@@ -191,7 +200,8 @@ public class SecureWSConnectorTest {
         final long timeToWait = 2000;
 
         final StringBuilder request = new StringBuilder("");
-        request.append("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">");
+        request.append(
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">");
         request.append(" <soapenv:Header/>");
         request.append(" <soapenv:Body>");
         request.append("    <spr:sayHi>");
@@ -201,31 +211,38 @@ public class SecureWSConnectorTest {
         request.append("</soapenv:Envelope>");
 
         final List<String> timeoutList = Collections.singletonList(String.valueOf(timeout));
-        final Map<String, List<String>> requestHeaders = Collections.singletonMap("com.sun.xml.ws.request.timeout", timeoutList);
+        final Map<String, List<String>> requestHeaders = Collections.singletonMap("com.sun.xml.ws.request.timeout",
+                timeoutList);
 
-        execute(request.toString(), SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloTimeout", "HelloWorldImplService", "HelloWorldImplPort",
+        execute(request.toString(), SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloTimeout",
+                "HelloWorldImplService", "HelloWorldImplPort",
                 "http://hello.cxf.ws.connectors.bonitasoft.org/", null, "guest", "guest", requestHeaders);
     }
 
-    private String execute(final String request, final String binding, final String endpoint, final String service, final String port, final String ns,
+    private String execute(final String request, final String binding, final String endpoint, final String service,
+            final String port, final String ns,
             final String soapAction, final String username, final String password) throws Exception {
         return execute(request, binding, endpoint, service, port, ns, soapAction, username, password, null);
     }
 
-    private String execute(final String request, final String binding, final String endpoint, final String service, final String port, final String ns,
-            final String soapAction, final String username, final String password, final Map<String, List<String>> requestHeaders) throws Exception {
+    private String execute(final String request, final String binding, final String endpoint, final String service,
+            final String port, final String ns,
+            final String soapAction, final String username, final String password,
+            final Map<String, List<String>> requestHeaders) throws Exception {
         return execute(request, binding, endpoint, service, port, ns, soapAction, username, password, requestHeaders, null);
     }
 
-    private String execute(final String request, final String binding, final String endpoint, final String service, final String port, final String ns,
-            final String soapAction, final String username, final String password, final Map<String, List<String>> requestHeaders,
+    private String execute(final String request, final String binding, final String endpoint, final String service,
+            final String port, final String ns,
+            final String soapAction, final String username, final String password,
+            final Map<String, List<String>> requestHeaders,
             final List<List<Object>> requestHeadersAsList) throws Exception {
 
         if (requestHeadersAsList != null && requestHeaders != null) {
             throw new RuntimeException("only one of requestHeaders and requestHeadersAsList can be specified");
         }
 
-        final Map<String, Object> parameters = new HashMap<String, Object>();
+        final Map<String, Object> parameters = new HashMap<>();
         parameters.put("envelope", request);
         parameters.put("binding", binding);
         parameters.put("endpointAddress", endpoint);
@@ -240,9 +257,9 @@ public class SecureWSConnectorTest {
         parameters.put("printRequestAndResponse", true);
 
         if (requestHeaders != null) {
-            final List<List<Object>> requestHeadersList = new ArrayList<List<Object>>();
+            final List<List<Object>> requestHeadersList = new ArrayList<>();
             for (final String key : requestHeaders.keySet()) {
-                final List<Object> row = new ArrayList<Object>();
+                final List<Object> row = new ArrayList<>();
                 row.add(key);
                 row.add(requestHeaders.get(key));
                 requestHeadersList.add(row);
