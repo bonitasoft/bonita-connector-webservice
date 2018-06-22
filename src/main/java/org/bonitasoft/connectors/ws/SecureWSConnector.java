@@ -212,20 +212,20 @@ public class SecureWSConnector extends AbstractConnector {
 
         restoreConfiguration();
 
-        Boolean buildResponseDocumentEnveloppe = (Boolean) getInputParameter(BUILD_RESPONSE_DOCUMENT_ENVELOPE);
-        LOGGER.info(BUILD_RESPONSE_DOCUMENT_ENVELOPE + " " + buildResponseDocumentEnveloppe);
+        Boolean buildResponseDocumentEnvelope = (Boolean) getInputParameter(BUILD_RESPONSE_DOCUMENT_ENVELOPE);
+        LOGGER.info(BUILD_RESPONSE_DOCUMENT_ENVELOPE + " " + buildResponseDocumentEnvelope);
         Boolean buildResponseDocumentBody = (Boolean) getInputParameter(BUILD_RESPONSE_DOCUMENT_BODY);
         LOGGER.info(BUILD_RESPONSE_DOCUMENT_BODY + " " + buildResponseDocumentBody);
-        if (buildResponseDocumentEnveloppe == null) {
-            buildResponseDocumentEnveloppe = false;
+        if (buildResponseDocumentEnvelope == null) {
+            buildResponseDocumentEnvelope = false;
         }
         if (buildResponseDocumentBody == null) {
             buildResponseDocumentBody = false;
         }
         Document responseDocumentEnvelope = null;
 
-        if (buildResponseDocumentEnveloppe || buildResponseDocumentBody) {
-            responseDocumentEnvelope = buildResponseDocumentEnveloppe(sourceResponse);
+        if (buildResponseDocumentEnvelope || buildResponseDocumentBody) {
+            responseDocumentEnvelope = buildResponseDocumentEnvelope(sourceResponse);
         }
         Document responseDocumentBody = null;
         if (buildResponseDocumentBody) {
@@ -238,7 +238,7 @@ public class SecureWSConnector extends AbstractConnector {
             printRequestAndResponse = false;
         }
         if (printRequestAndResponse) {
-            printRequestAndResponse(sourceResponse, buildResponseDocumentEnveloppe, buildResponseDocumentBody, responseDocumentEnvelope, responseDocumentBody);
+            printRequestAndResponse(sourceResponse, buildResponseDocumentEnvelope, buildResponseDocumentBody, responseDocumentEnvelope, responseDocumentBody);
         }
 
         setOutputParameter(OUTPUT_SOURCE_RESPONSE, sourceResponse);
@@ -311,7 +311,7 @@ public class SecureWSConnector extends AbstractConnector {
         return configuration;
     }
 
-    private Document buildResponseDocumentEnveloppe(Source sourceResponse) throws ConnectorException {
+    private Document buildResponseDocumentEnvelope(Source sourceResponse) throws ConnectorException {
         final DOMResult result = new DOMResult();
         Document responseDocumentEnvelope;
         try {
@@ -339,7 +339,7 @@ public class SecureWSConnector extends AbstractConnector {
             } catch (final ParserConfigurationException pce) {
                 throw new ConnectorException(pce);
             }
-            final Node bodyContent = getEnveloppeBodyContent(responseDocumentEnvelope);
+            final Node bodyContent = getEnvelopeBodyContent(responseDocumentEnvelope);
             final Node clonedBodyContent = bodyContent.cloneNode(true);
             responseDocumentBody.adoptNode(clonedBodyContent);
             responseDocumentBody.importNode(clonedBodyContent, true);
@@ -348,11 +348,11 @@ public class SecureWSConnector extends AbstractConnector {
         return responseDocumentBody;
     }
 
-    private void printRequestAndResponse(Source sourceResponse, boolean buildResponseDocumentEnveloppe, boolean buildResponseDocumentBody,
+    private void printRequestAndResponse(Source sourceResponse, boolean buildResponseDocumentEnvelope, boolean buildResponseDocumentBody,
             Document responseDocumentEnvelope, Document responseDocumentBody) {
         try {
             getTransformer().transform(sourceResponse, new StreamResult(System.err));
-            if (buildResponseDocumentEnveloppe) {
+            if (buildResponseDocumentEnvelope) {
                 getTransformer().transform(new DOMSource(responseDocumentEnvelope), new StreamResult(System.err));
             } else if (buildResponseDocumentBody) {
                 getTransformer().transform(new DOMSource(responseDocumentEnvelope), new StreamResult(System.err));
@@ -363,25 +363,25 @@ public class SecureWSConnector extends AbstractConnector {
         }
     }
 
-    private Node getEnveloppeBodyContent(final Document enveloppe) {
-        final Node enveloppeNode = enveloppe.getFirstChild();
-        final NodeList children = enveloppeNode.getChildNodes();
-        Node enveloppeBody = null;
+    private Node getEnvelopeBodyContent(final Document envelope) {
+        final Node envelopeNode = envelope.getFirstChild();
+        final NodeList children = envelopeNode.getChildNodes();
+        Node envelopeBody = null;
         for (int i = 0; i < children.getLength(); i++) {
             final Node child = children.item(i);
             if (child instanceof Element) {
                 final Element element = (Element) child;
                 if ("Body".equalsIgnoreCase(element.getLocalName())) {
-                    enveloppeBody = child;
+                    envelopeBody = child;
                     break;
                 }
             }
         }
-        if (enveloppeBody == null) {
-            return enveloppeNode;
+        if (envelopeBody == null) {
+            return envelopeNode;
         }
 
-        return enveloppeBody.getFirstChild();
+        return envelopeBody.getFirstChild();
     }
 
     private Transformer getTransformer() throws TransformerConfigurationException, TransformerFactoryConfigurationError {
