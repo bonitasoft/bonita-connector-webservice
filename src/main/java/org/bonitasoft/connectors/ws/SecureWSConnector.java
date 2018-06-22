@@ -162,7 +162,7 @@ public class SecureWSConnector extends AbstractConnector {
             LOGGER.info(USER_NAME + " " + authUserName);
             dispatch.getRequestContext().put(BindingProvider.USERNAME_PROPERTY, authUserName);
             final Object authPassword = getInputParameter(PASSWORD);
-            LOGGER.info(PASSWORD + " " + authPassword);
+            LOGGER.info(PASSWORD + " ********");
             dispatch.getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, authPassword);
         }
 
@@ -284,7 +284,7 @@ public class SecureWSConnector extends AbstractConnector {
         final String user = (String) getInputParameter(PROXY_USER);
         LOGGER.info(PROXY_USER + " " + user);
         final String password = (String) getInputParameter(PROXY_PASSWORD);
-        LOGGER.info(PROXY_PASSWORD + " " + password);
+        LOGGER.info(PROXY_PASSWORD + " ********");
         if (user != null && !user.isEmpty()) {
             Authenticator.setDefault(new Authenticator() {
 
