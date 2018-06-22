@@ -139,30 +139,6 @@ public class SecureWSConnectorTest {
                 "http://hello.cxf.ws.connectors.bonitasoft.org/", null, "guest", "guest", requestHeaders);
     }
 
-    @Test
-    public void testHTTPHeaderOK2() throws Exception {
-        final StringBuilder request = new StringBuilder("");
-        request.append(
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">");
-        request.append(" <soapenv:Header/>");
-        request.append(" <soapenv:Body>");
-        request.append("    <spr:sayHi>");
-        request.append("       <arg0>Rodrigue test</arg0>");
-        request.append("    </spr:sayHi>");
-        request.append(" </soapenv:Body>");
-        request.append("</soapenv:Envelope>");
-        final String headerName = "testName";
-        final String headerValue = "testValue";
-        final List<String> header = new ArrayList<>();
-        final Map<String, List<String>> requestHeaders = new HashMap<>();
-        header.add(headerValue);
-        requestHeaders.put(headerName, header);
-
-        execute(request.toString(), SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloHeader",
-                "HelloHeaderImplService", "HelloWorldImplPort",
-                "http://hello.cxf.ws.connectors.bonitasoft.org/", null, "guest", "guest", requestHeaders);
-    }
-
     @Test(expected = ConnectorException.class)
     public void testHTTPHeaderKO() throws Exception {
 
