@@ -11,7 +11,7 @@
 	<version>1.1.1-SNAPSHOT</version>
 
     <properties>
-        <bonita.engine.version>7.4.0</bonita.engine.version>
+        <bonita.engine.version>7.7.1</bonita.engine.version>
         <cxf.version>2.4.0</cxf.version>
     </properties>
 
