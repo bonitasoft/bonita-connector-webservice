@@ -23,6 +23,5 @@ import javax.jws.WebService;
 
 @WebService
 public interface HelloTimeout {
-    String sayHi(String text);
+    String sayHi(String text) throws InterruptedException;
 }
-// END SNIPPET: service
