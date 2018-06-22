@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
-
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -358,7 +357,7 @@ public class SecureWSConnector extends AbstractConnector {
         }
     }
 
-    private Node getEnvelopeBodyContent(final Document envelope) {
+    Node getEnvelopeBodyContent(final Document envelope) {
         final Node envelopeNode = envelope.getFirstChild();
         final NodeList children = envelopeNode.getChildNodes();
         Node envelopeBody = null;
@@ -376,10 +375,18 @@ public class SecureWSConnector extends AbstractConnector {
             return envelopeNode;
         }
 
-        return envelopeBody.getFirstChild();
+        final NodeList bodyChildren = envelopeBody.getChildNodes();
+        for (int i = 0; i < bodyChildren.getLength(); i++) {
+            final Node child = bodyChildren.item(i);
+            if (child instanceof Element) {
+                return child;
+            }
+        }
+
+        return envelopeBody;
     }
 
-    private Transformer getTransformer() throws TransformerConfigurationException {
+    Transformer getTransformer() throws TransformerConfigurationException {
         if (transformer == null) {
             transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");

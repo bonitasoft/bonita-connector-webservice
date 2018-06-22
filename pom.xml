@@ -1,14 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<artifactId>bonita-connectors</artifactId>
-		<groupId>org.bonitasoft.connectors</groupId>
-		<version>1.0.0</version>
-	</parent>
+    <parent>
+        <artifactId>bonita-connectors</artifactId>
+        <groupId>org.bonitasoft.connectors</groupId>
+        <version>1.0.0</version>
+    </parent>
 
-	<artifactId>bonita-connector-webservice-impl</artifactId>
-	<version>1.1.1-SNAPSHOT</version>
+    <artifactId>bonita-connector-webservice-impl</artifactId>
+    <version>1.1.1-SNAPSHOT</version>
 
     <properties>
         <bonita.engine.version>7.7.1</bonita.engine.version>
@@ -16,13 +16,13 @@
     </properties>
 
     <dependencies>
-         <dependency>
+        <dependency>
             <artifactId>bonita-common</artifactId>
             <groupId>org.bonitasoft.engine</groupId>
             <version>${bonita.engine.version}</version>
             <scope>provided</scope>
         </dependency>
-            <dependency>
+        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
             <version>${cxf.version}</version>
@@ -132,6 +132,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.7.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.mortbay.jetty</groupId>
             <artifactId>jetty</artifactId>
             <version>6.1.22</version>
@@ -139,8 +145,7 @@
         </dependency>
     </dependencies>
 
-
-  <build>
+    <build>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -207,13 +212,11 @@
         </plugins>
     </build>
 
-
-
-	<scm>
-		<developerConnection>scm:git:git@github.com:bonitasoft/bonita-connector-webservice.git</developerConnection>
-		<connection>scm:git:git@github.com:bonitasoft/bonita-connector-webservice.git</connection>
-		<url>https://github.com/bonitasoft/bonita-connector-webservice</url>
-		<tag>HEAD</tag>
-	</scm>
+    <scm>
+        <developerConnection>scm:git:git@github.com:bonitasoft/bonita-connector-webservice.git</developerConnection>
+        <connection>scm:git:git@github.com:bonitasoft/bonita-connector-webservice.git</connection>
+        <url>https://github.com/bonitasoft/bonita-connector-webservice</url>
+        <tag>HEAD</tag>
+    </scm>
 
 </project>
