@@ -69,21 +69,19 @@ public class SecureWSConnectorTest {
 
     @Test
     public void testCustomer() throws Exception {
-        final StringBuilder request = new StringBuilder("");
 
-        request.append(
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:man=\"http://www.orangecaraibe.com/soa/v2/Interfaces/ManageCustomerOrderInternal\">");
-        request.append("<soapenv:Header/>");
-        request.append("<soapenv:Body>");
-        request.append("  <man:executeStep>");
-        request.append("    <!--Optional:-->");
-        request.append("    <man:processStepId>7586</man:processStepId>");
-        request.append("    <man:processStepDate>20110713</man:processStepDate>");
-        request.append("  </man:executeStep>");
-        request.append("</soapenv:Body>");
-        request.append("</soapenv:Envelope>");
-
-        final String response = execute(request.toString(), SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/Customer",
+        String request = "" +
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:man=\"http://www.orangecaraibe.com/soa/v2/Interfaces/ManageCustomerOrderInternal\">" +
+                "<soapenv:Header/>" +
+                "<soapenv:Body>" +
+                "  <man:executeStep>" +
+                "    <!--Optional:-->" +
+                "    <man:processStepId>7586</man:processStepId>" +
+                "    <man:processStepDate>20110713</man:processStepDate>" +
+                "  </man:executeStep>" +
+                "</soapenv:Body>" +
+                "</soapenv:Envelope>";
+        final String response = execute(request, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/Customer",
                 "ManageCustomerOrderInternalImplService", "ManageCustomerOrderInternalImplPort",
                 "http://hello.cxf.ws.connectors.bonitasoft.org/", null,
                 "guest", "guest");
@@ -94,18 +92,16 @@ public class SecureWSConnectorTest {
     @Test
     public void testBasicHTTPAuth() throws Exception {
 
-        final StringBuilder request = new StringBuilder("");
-        request.append(
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">");
-        request.append(" <soapenv:Header/>");
-        request.append(" <soapenv:Body>");
-        request.append("    <spr:sayHi>");
-        request.append("       <arg0>Rodrigue test</arg0>");
-        request.append("    </spr:sayHi>");
-        request.append(" </soapenv:Body>");
-        request.append("</soapenv:Envelope>");
-
-        final String response = execute(request.toString(), SOAPBinding.SOAP11HTTP_BINDING,
+        String request =
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">" +
+                " <soapenv:Header/>" +
+                " <soapenv:Body>" +
+                "    <spr:sayHi>" +
+                "       <arg0>Rodrigue test</arg0>" +
+                "    </spr:sayHi>" +
+                " </soapenv:Body>" +
+                "</soapenv:Envelope>";
+        final String response = execute(request, SOAPBinding.SOAP11HTTP_BINDING,
                 "http://localhost:9002/HelloWorld", "HelloWorldImplService",
                 "HelloWorldImplPort", "http://hello.cxf.ws.connectors.bonitasoft.org/", null, "guest", "guest");
         assertTrue(response, response.contains("Rodrigue test"));
@@ -115,17 +111,6 @@ public class SecureWSConnectorTest {
     @Test
     public void testHTTPHeaderOK() throws Exception {
 
-        final StringBuilder request = new StringBuilder("");
-        request.append(
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">");
-        request.append(" <soapenv:Header/>");
-        request.append(" <soapenv:Body>");
-        request.append("    <spr:sayHi>");
-        request.append("       <arg0>Rodrigue test</arg0>");
-        request.append("    </spr:sayHi>");
-        request.append(" </soapenv:Body>");
-        request.append("</soapenv:Envelope>");
-
         final String headerName = "testName";
         final String headerValue = "testValue";
 
@@ -134,24 +119,23 @@ public class SecureWSConnectorTest {
         header.add(headerValue);
         requestHeaders.put(headerName, header);
 
-        execute(request.toString(), SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloHeader",
+        String request =
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">"+
+                " <soapenv:Header/>"+
+                " <soapenv:Body>"+
+                "    <spr:sayHi>"+
+                "       <arg0>Rodrigue test</arg0>"+
+                "    </spr:sayHi>"+
+                " </soapenv:Body>"+
+                "</soapenv:Envelope>";
+        final String result = execute(request, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloHeader",
                 "HelloHeaderImplService", "HelloWorldImplPort",
                 "http://hello.cxf.ws.connectors.bonitasoft.org/", null, "guest", "guest", requestHeaders);
+        assertTrue(result.contains("Hello Rodrigue test"));
     }
 
     @Test(expected = ConnectorException.class)
     public void testHTTPHeaderKO() throws Exception {
-
-        final StringBuilder request = new StringBuilder("");
-        request.append(
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">");
-        request.append(" <soapenv:Header/>");
-        request.append(" <soapenv:Body>");
-        request.append("    <spr:sayHi>");
-        request.append("       <arg0>Rodrigue test</arg0>");
-        request.append("    </spr:sayHi>");
-        request.append(" </soapenv:Body>");
-        request.append("</soapenv:Envelope>");
 
         final String headerName = "testName";
         final String headerValue = "testValue2";
@@ -161,7 +145,16 @@ public class SecureWSConnectorTest {
         header.add(headerValue);
         requestHeaders.put(headerName, header);
 
-        execute(request.toString(), SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloHeader",
+        String request = "" +
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">" +
+                " <soapenv:Header/>" +
+                " <soapenv:Body>" +
+                "    <spr:sayHi>" +
+                "       <arg0>Rodrigue test</arg0>" +
+                "    </spr:sayHi>" +
+                " </soapenv:Body>" +
+                "</soapenv:Envelope>";
+        execute(request, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloHeader",
                 "HelloHeaderImplService", "HelloWorldImplPort",
                 "http://hello.cxf.ws.connectors.bonitasoft.org/", null, "guest", "guest", requestHeaders);
         Assert.fail("This call should fail...");
@@ -175,22 +168,20 @@ public class SecureWSConnectorTest {
         final long timeout = 10000;
         final long timeToWait = 2000;
 
-        final StringBuilder request = new StringBuilder("");
-        request.append(
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">");
-        request.append(" <soapenv:Header/>");
-        request.append(" <soapenv:Body>");
-        request.append("    <spr:sayHi>");
-        request.append("       <arg0>" + timeToWait + "</arg0>");
-        request.append("    </spr:sayHi>");
-        request.append(" </soapenv:Body>");
-        request.append("</soapenv:Envelope>");
-
         final List<String> timeoutList = Collections.singletonList(String.valueOf(timeout));
         final Map<String, List<String>> requestHeaders = Collections.singletonMap("com.sun.xml.ws.request.timeout",
                 timeoutList);
 
-        execute(request.toString(), SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloTimeout",
+        String request = "" +
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">" +
+                " <soapenv:Header/>" +
+                " <soapenv:Body>" +
+                "    <spr:sayHi>" +
+                "       <arg0>" + timeToWait + "</arg0>" +
+                "    </spr:sayHi>" +
+                " </soapenv:Body>" +
+                "</soapenv:Envelope>";
+        execute(request, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloTimeout",
                 "HelloWorldImplService", "HelloWorldImplPort",
                 "http://hello.cxf.ws.connectors.bonitasoft.org/", null, "guest", "guest", requestHeaders);
     }

@@ -34,7 +34,6 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -106,7 +105,7 @@ public class SecureWSConnector extends AbstractConnector {
 
     private Transformer transformer;
 
-    private Map<String, String> saveProxyConfiguration = new HashMap<String, String>();
+    private Map<String, String> saveProxyConfiguration = new HashMap<>();
 
     @Override
     public void validateInputParameters() throws ConnectorValidationException {
@@ -179,10 +178,10 @@ public class SecureWSConnector extends AbstractConnector {
         final List<List<Object>> httpHeadersList = (List<List<Object>>) getInputParameter(HTTP_HEADERS);
 
         if (httpHeadersList != null) {
-            final Map<String, List<String>> httpHeadersMap = new HashMap<String, List<String>>();
+            final Map<String, List<String>> httpHeadersMap = new HashMap<>();
             for (final List<Object> row : httpHeadersList) {
                 if (row.size() == 2) {
-                    final List<String> parameters = new ArrayList<String>();
+                    final List<String> parameters = new ArrayList<>();
                     final Object value = row.get(1);
                     if (value instanceof Collection) {
                         for (final Object parameter : (Collection<Object>) value) {
@@ -301,7 +300,7 @@ public class SecureWSConnector extends AbstractConnector {
     }
 
     private Map<String, String> saveProxyConfiguration() {
-        final Map<String, String> configuration = new HashMap<String, String>();
+        final Map<String, String> configuration = new HashMap<>();
         configuration.put("http.proxyHost", System.getProperty("http.proxyHost"));
         configuration.put("http.proxyPort", System.getProperty("http.proxyPort"));
         configuration.put("https.proxyHost", System.getProperty("https.proxyHost"));
@@ -316,12 +315,8 @@ public class SecureWSConnector extends AbstractConnector {
         Document responseDocumentEnvelope;
         try {
             getTransformer().transform(sourceResponse, result);
-        } catch (final TransformerConfigurationException tce) {
-            throw new ConnectorException(tce);
         } catch (final TransformerException te) {
             throw new ConnectorException(te);
-        } catch (final TransformerFactoryConfigurationError tfce) {
-            throw new ConnectorException(tfce);
         }
         if (result.getNode() instanceof Document) {
             responseDocumentEnvelope = (Document) result.getNode();
@@ -384,10 +379,11 @@ public class SecureWSConnector extends AbstractConnector {
         return envelopeBody.getFirstChild();
     }
 
-    private Transformer getTransformer() throws TransformerConfigurationException, TransformerFactoryConfigurationError {
+    private Transformer getTransformer() throws TransformerConfigurationException {
         if (transformer == null) {
             transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
         }
         return transformer;
     }

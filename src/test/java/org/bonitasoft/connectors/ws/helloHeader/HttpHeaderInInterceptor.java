@@ -20,11 +20,10 @@ public class HttpHeaderInInterceptor extends AbstractSoapInterceptor {
         final Map<String, List<String>> headers = (Map<String, List<String>>) message.get(org.apache.cxf.message.Message.PROTOCOL_HEADERS);
         System.out.println("HTTP HEADERS : " + headers);
 
-        final Map<String, List<String>> typedHeaders = headers;
-        if (!typedHeaders.containsKey("testName")) {
+        if (!headers.containsKey("testName")) {
             throw new Fault(new Exception("TestName not found"));
         }
-        final List<String> testNameValue = typedHeaders.get("testName");
+        final List<String> testNameValue = headers.get("testName");
         if (testNameValue.size() != 1) {
             throw new Fault(new Exception("TestName contains more than 1 element"));
         }
