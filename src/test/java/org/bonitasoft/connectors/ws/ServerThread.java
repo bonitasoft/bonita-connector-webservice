@@ -16,7 +16,11 @@
  */
 package org.bonitasoft.connectors.ws;
 
+import java.util.logging.Logger;
+
 public class ServerThread extends Thread {
+
+    private static final Logger LOG = Logger.getLogger(ServerThread.class.getName());
 
     private final org.mortbay.jetty.Server server;
 
@@ -30,7 +34,7 @@ public class ServerThread extends Thread {
     public void run() {
         try {
             server.start();
-            System.out.println("Server ready...");
+            LOG.info("Server ready...");
             server.join();
         } catch (final Exception e) {
             startFailed = true;

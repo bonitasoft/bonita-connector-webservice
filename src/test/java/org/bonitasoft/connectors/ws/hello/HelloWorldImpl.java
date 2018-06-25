@@ -19,14 +19,17 @@
 // START SNIPPET: service
 package org.bonitasoft.connectors.ws.hello;
 
+import java.util.logging.Logger;
 import javax.jws.WebService;
 
 @WebService(endpointInterface = "org.bonitasoft.connectors.ws.hello.HelloWorld")
 public class HelloWorldImpl implements HelloWorld {
 
+    private static final Logger LOG = Logger.getLogger(HelloWorldImpl.class.getName());
+
     @Override
     public String sayHi(String text) {
-        System.out.println("sayHi called");
+        LOG.info("sayHi called");
         return "Hello " + text;
     }
 }

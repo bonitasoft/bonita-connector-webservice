@@ -17,15 +17,18 @@
 // START SNIPPET: service
 package org.bonitasoft.connectors.ws.helloHeader;
 
+import java.util.logging.Logger;
 import javax.jws.WebService;
 
 @org.apache.cxf.interceptor.InInterceptors(interceptors = { "org.bonitasoft.connectors.ws.helloHeader.HttpHeaderInInterceptor" })
 @WebService(endpointInterface = "org.bonitasoft.connectors.ws.helloHeader.HelloHeader")
 public class HelloHeaderImpl implements HelloHeader {
 
+    private static final Logger LOG = Logger.getLogger(HelloHeaderImpl.class.getName());
+
     @Override
     public String sayHi(final String text) {
-        System.out.println("sayHi called");
+        LOG.info("sayHi called");
         return "Hello " + text;
     }
 }
