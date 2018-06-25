@@ -257,7 +257,7 @@ public class SecureWSConnectorTest {
 
     private void printResponse(final String response) {
         assertThat(response).isNotNull();
-        System.out.println("response=\n" + response);
+        LOG.info("response=\n" + response);
     }
 
 }

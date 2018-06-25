@@ -18,6 +18,7 @@ package org.bonitasoft.connectors.ws;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Logger;
 
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
@@ -29,6 +30,8 @@ import org.mortbay.jetty.security.UserRealm;
 import org.mortbay.jetty.webapp.WebAppContext;
 
 public class Server {
+
+    private static final Logger LOG = Logger.getLogger(Server.class.getName());
 
     private static final long TIMEOUT = 3 * 60000;
 
@@ -63,11 +66,11 @@ public class Server {
 
     public void start() throws Exception {
         thread.start();
-        System.err.println("Starting server...");
+        LOG.info("Starting server...");
         final long startTime = System.currentTimeMillis();
 
         do {
-            System.err.println("Waiting...");
+            LOG.info("Waiting...");
             Thread.sleep(200);
         } while (!thread.isServerStarted() && !thread.isStartFailed() && System.currentTimeMillis() < startTime + TIMEOUT);
         if (System.currentTimeMillis() >= startTime + TIMEOUT) {
@@ -75,10 +78,10 @@ public class Server {
         } else if (thread.isStartFailed()) {
             throw new Exception("Unable to start the server, see log");
         }
-        System.err.println("Server started.");
-        System.err.println("Waiting for WS to be deployed...");
+        LOG.info("Server started.");
+        LOG.info("Waiting for WS to be deployed...");
         Thread.sleep(7000);
-        System.err.println("Assuming WS are deployed.");
+        LOG.info("Assuming WS are deployed.");
     }
 
     public void stop() throws Exception {
