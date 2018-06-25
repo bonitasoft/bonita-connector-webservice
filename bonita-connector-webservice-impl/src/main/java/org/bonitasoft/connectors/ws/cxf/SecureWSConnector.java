@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -290,7 +289,15 @@ public class SecureWSConnector extends AbstractConnector {
             return enveloppeNode;
         }
 
-        return enveloppeBody.getFirstChild();
+        final NodeList bodyChildren = enveloppeBody.getChildNodes();
+        for (int i = 0; i < bodyChildren.getLength(); i++) {
+            final Node child = bodyChildren.item(i);
+            if (child instanceof Element) {
+                return child;
+            }
+        }
+
+        return enveloppeBody;
     }
 
     private Transformer getTransformer() throws TransformerConfigurationException, TransformerFactoryConfigurationError {
