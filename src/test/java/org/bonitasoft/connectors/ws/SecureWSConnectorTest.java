@@ -1,7 +1,6 @@
 package org.bonitasoft.connectors.ws;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -10,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -24,17 +22,16 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
-
-import junit.framework.Assert;
 
 public class SecureWSConnectorTest {
 
     private static Server server;
 
-    protected static final Logger LOG = Logger.getLogger(SecureWSConnectorTest.class.getName());
+    private static final Logger LOG = Logger.getLogger(SecureWSConnectorTest.class.getName());
 
     @Rule
     public TestRule testWatcher = new TestWatcher() {
@@ -85,13 +82,12 @@ public class SecureWSConnectorTest {
                 "ManageCustomerOrderInternalImplService", "ManageCustomerOrderInternalImplPort",
                 "http://hello.cxf.ws.connectors.bonitasoft.org/", null,
                 "guest", "guest");
-        assertTrue(response, response.contains("false"));
+        assertThat(response).as(response).contains("false");
 
     }
 
     @Test
     public void testBasicHTTPAuth() throws Exception {
-
         String request =
                 "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">" +
                 " <soapenv:Header/>" +
@@ -104,8 +100,7 @@ public class SecureWSConnectorTest {
         final String response = execute(request, SOAPBinding.SOAP11HTTP_BINDING,
                 "http://localhost:9002/HelloWorld", "HelloWorldImplService",
                 "HelloWorldImplPort", "http://hello.cxf.ws.connectors.bonitasoft.org/", null, "guest", "guest");
-        assertTrue(response, response.contains("Rodrigue test"));
-
+        assertThat(response).as(response).contains("Rodrigue test");
     }
 
     @Test
@@ -131,10 +126,13 @@ public class SecureWSConnectorTest {
         final String result = execute(request, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloHeader",
                 "HelloHeaderImplService", "HelloWorldImplPort",
                 "http://hello.cxf.ws.connectors.bonitasoft.org/", null, "guest", "guest", requestHeaders);
-        assertTrue(result.contains("Hello Rodrigue test"));
+        assertThat(result).contains("Hello Rodrigue test");
     }
 
-    @Test(expected = ConnectorException.class)
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
+    @Test
     public void testHTTPHeaderKO() throws Exception {
 
         final String headerName = "testName";
@@ -154,19 +152,18 @@ public class SecureWSConnectorTest {
                 "    </spr:sayHi>" +
                 " </soapenv:Body>" +
                 "</soapenv:Envelope>";
+
+        expectedException.expect(ConnectorException.class);
+
         execute(request, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloHeader",
                 "HelloHeaderImplService", "HelloWorldImplPort",
                 "http://hello.cxf.ws.connectors.bonitasoft.org/", null, "guest", "guest", requestHeaders);
-        Assert.fail("This call should fail...");
-
     }
 
     @Test
     public void testReadTimeoutOK() throws Exception {
-
-        // ms
-        final long timeout = 10000;
-        final long timeToWait = 2000;
+        final long timeout = 10000; // in ms
+        final long timeToWait = 2000; // in ms
 
         final List<String> timeoutList = Collections.singletonList(String.valueOf(timeout));
         final Map<String, List<String>> requestHeaders = Collections.singletonMap("com.sun.xml.ws.request.timeout",
@@ -181,9 +178,10 @@ public class SecureWSConnectorTest {
                 "    </spr:sayHi>" +
                 " </soapenv:Body>" +
                 "</soapenv:Envelope>";
-        execute(request, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloTimeout",
+        final String result = execute(request, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloTimeout",
                 "HelloWorldImplService", "HelloWorldImplPort",
                 "http://hello.cxf.ws.connectors.bonitasoft.org/", null, "guest", "guest", requestHeaders);
+        assertThat(result).contains("Hello Timeout");
     }
 
     private String execute(final String request, final String binding, final String endpoint, final String service,
@@ -249,7 +247,7 @@ public class SecureWSConnectorTest {
     }
 
     private String parse(final Source response) throws TransformerFactoryConfigurationError, TransformerException {
-        assertNotNull(response);
+        assertThat(response).isNotNull();
         final Transformer transformer = TransformerFactory.newInstance().newTransformer();
         final StringWriter writer = new StringWriter();
         final StreamResult result = new StreamResult(writer);
@@ -258,7 +256,7 @@ public class SecureWSConnectorTest {
     }
 
     private void printResponse(final String response) {
-        assertNotNull(response);
+        assertThat(response).isNotNull();
         System.out.println("response=\n" + response);
     }
 
