@@ -216,7 +216,7 @@
         <developerConnection>scm:git:git@github.com:bonitasoft/bonita-connector-webservice.git</developerConnection>
         <connection>scm:git:git@github.com:bonitasoft/bonita-connector-webservice.git</connection>
         <url>https://github.com/bonitasoft/bonita-connector-webservice</url>
-        <tag>HEAD</tag>
+        <tag>1.1.0</tag>
     </scm>
 
 </project>
