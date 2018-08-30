@@ -9,7 +9,7 @@ timestamps {
                             credentialsId: 'github',
                             passwordVariable: 'GIT_PASSWORD',
                             usernameVariable: 'GIT_USERNAME')]) {
-                        sh './mvnw -B release:prepare release:perform -Darguments="-DskipTests -DaltDeploymentRepository=internal.releases::default::http://repositories.rd.lan/maven/internal.releases"'
+                        sh "./mvnw -B release:prepare release:perform -Darguments=-DaltDeploymentRepository=${env.ALT_DEPLOYMENT_REPOSITORY_TAG}"
                   }
              }
         }
