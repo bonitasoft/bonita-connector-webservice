@@ -10,6 +10,34 @@
     <artifactId>bonita-connector-webservice-impl</artifactId>
     <version>1.1.1</version>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.bonitasoft.engine</groupId>
+                <artifactId>bonita-engine</artifactId>
+                <version>7.9.0-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- We must lock the springframework version because cxf depends on this version, and the engine on an other -->
+            <dependency>
+            	<groupId>org.springframework</groupId>
+            	<artifactId>spring-web</artifactId>
+            	<version>3.0.5.RELEASE</version>
+            </dependency>
+            <dependency>
+            	<groupId>org.springframework</groupId>
+            	<artifactId>spring-core</artifactId>
+            	<version>3.0.5.RELEASE</version>
+            </dependency>
+            <dependency>
+            	<groupId>org.springframework</groupId>
+            	<artifactId>spring-context</artifactId>
+            	<version>3.0.5.RELEASE</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <properties>
         <bonita.engine.version>7.7.1</bonita.engine.version>
         <cxf.version>2.4.0</cxf.version>
@@ -29,44 +57,8 @@
             <scope>test</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>org.apache.cxf</groupId>
-                    <artifactId>cxf-common-schemas</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>asm</groupId>
                     <artifactId>asm</artifactId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>geronimo-jaxws_2.1_spec</artifactId>
-                    <groupId>org.apache.geronimo.specs</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>saaj-api</artifactId>
-                    <groupId>javax.xml.soap</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>saaj-impl</artifactId>
-                    <groupId>com.sun.xml.messaging.saaj</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>geronimo-activation_1.1_spec</artifactId>
-                    <groupId>org.apache.geronimo.specs</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jaxb-api</artifactId>
-                    <groupId>javax.xml.bind</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jaxb-impl</artifactId>
-                    <groupId>com.sun.xml.bind</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>wstx-asl</artifactId>
-                    <groupId>org.codehaus.woodstox</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>stax-api</artifactId>
-                    <groupId>javax.xml.stream</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -77,40 +69,8 @@
             <scope>test</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>org.apache.cxf</groupId>
-                    <artifactId>cxf-common-schemas</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>asm</groupId>
                     <artifactId>asm</artifactId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>geronimo-jaxws_2.1_spec</artifactId>
-                    <groupId>org.apache.geronimo.specs</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>saaj-api</artifactId>
-                    <groupId>javax.xml.soap</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>saaj-impl</artifactId>
-                    <groupId>com.sun.xml.messaging.saaj</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>geronimo-activation_1.1_spec</artifactId>
-                    <groupId>org.apache.geronimo.specs</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jaxb-api</artifactId>
-                    <groupId>javax.xml.bind</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jaxb-impl</artifactId>
-                    <groupId>com.sun.xml.bind</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>wstx-asl</artifactId>
-                    <groupId>org.codehaus.woodstox</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -119,12 +79,6 @@
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
             <version>${cxf.version}</version>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>slf4j-api</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <artifactId>junit</artifactId>
@@ -134,7 +88,6 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.7.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -142,6 +95,45 @@
             <artifactId>jetty</artifactId>
             <version>6.1.22</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.messaging.saaj</groupId>
+            <artifactId>saaj-impl</artifactId>
+            <version>1.3.28</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml.ws</groupId>
+            <artifactId>jaxws-api</artifactId>
+            <version>2.2.7</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.ws</groupId>
+            <artifactId>jaxws-rt</artifactId>
+            <version>2.2.7</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.jws</groupId>
+            <artifactId>jsr181-api</artifactId>
+            <version>1.0-MR1</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <version>1.1.1</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
