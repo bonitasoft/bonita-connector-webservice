@@ -8,7 +8,7 @@
     </parent>
 
     <artifactId>bonita-connector-webservice-impl</artifactId>
-    <version>1.1.1</version>
+    <version>1.2.0-SNAPSHOT</version>
 
     <properties>
         <bonita.engine.version>7.7.1</bonita.engine.version>
