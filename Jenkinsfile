@@ -9,7 +9,7 @@ timestamps {
 
             stage('Build') {
                 try {
-                    sh "./mvnw verify -Djvm=${env.JAVA_HOME_11}"
+                    sh "./mvnw verify -Djvm=${env.JAVA_HOME_11}/bin/java"
                 } finally {
                     junit allowEmptyResults: false, testResults: '**/target/*-reports/*.xml'
                 }
