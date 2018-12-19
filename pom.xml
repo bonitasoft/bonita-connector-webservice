@@ -8,7 +8,7 @@
     </parent>
 
     <artifactId>bonita-connector-webservice</artifactId>
-    <version>1.2.1</version>
+    <version>1.2.2-SNAPSHOT</version>
     
     <dependencyManagement>
         <dependencies>
@@ -237,7 +237,7 @@
         <developerConnection>scm:git:https://${env.GIT_USERNAME}:${env.GIT_PASSWORD}@github.com/bonitasoft/bonita-connector-webservice.git</developerConnection>
         <connection>scm:git:https://${env.GIT_USERNAME}:${env.GIT_PASSWORD}@github.com/bonitasoft/bonita-connector-webservice.git</connection>
         <url>https://github.com/bonitasoft/bonita-connector-webservice</url>
-        <tag>1.2.1</tag>
+        <tag>HEAD</tag>
     </scm>
 
 </project>
