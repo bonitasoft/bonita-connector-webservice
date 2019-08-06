@@ -9,13 +9,21 @@
 
     <artifactId>bonita-connector-webservice</artifactId>
     <version>1.2.3-SNAPSHOT</version>
-    
+
+    <properties>
+        <bonita.engine.version>7.9.2</bonita.engine.version>
+        <cxf.version>2.4.0</cxf.version>
+        <spring.version>3.0.5.RELEASE</spring.version>
+        <!-- Must match version used by Bonita -->
+        <jaxb.version>2.2.7</jaxb.version>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>org.bonitasoft.engine</groupId>
                 <artifactId>bonita-engine</artifactId>
-                <version>7.9.0-SNAPSHOT</version>
+                <version>${bonita.engine.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -23,17 +31,17 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-web</artifactId>
-                <version>3.0.5.RELEASE</version>
+                <version>${spring.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
-                <version>3.0.5.RELEASE</version>
+                <version>${spring.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
-                <version>3.0.5.RELEASE</version>
+                <version>${spring.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.jvnet.staxex</groupId>
@@ -42,11 +50,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <properties>
-        <bonita.engine.version>7.7.1</bonita.engine.version>
-        <cxf.version>2.4.0</cxf.version>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -123,6 +126,7 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
+            <version>3.13.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -159,6 +163,7 @@
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
+            <version>${jaxb.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
