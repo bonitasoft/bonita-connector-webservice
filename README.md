@@ -1,4 +1,4 @@
-# Webservice Connector
+# Webservice Connector [![Build Status](https://travis-ci.org/bonitasoft/bonita-connector-webservice.svg?branch=master)](https://travis-ci.org/bonitasoft/bonita-connector-webservice)
 
 Enables interactions in your BonitaBPM processes with a SOAP Webservices.
 
