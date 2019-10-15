@@ -282,27 +282,26 @@ public class SecureWSConnector extends AbstractConnector {
     private void sanitizeInputs() {
 
         Map<String, Object> sanitizedInputs = new HashMap<>();
-        sanitizedInputs.put(PASSWORD, sanitizeString((String) getInputParameter(PASSWORD)));
-        sanitizedInputs.put(USER_NAME, sanitizeString((String) getInputParameter(USER_NAME)));
-        sanitizedInputs.put(BINDING, sanitizeString((String) getInputParameter(BINDING)));
-        sanitizedInputs.put(SOAP_ACTION, sanitizeString((String) getInputParameter(SOAP_ACTION)));
-        sanitizedInputs.put(ENDPOINT_ADDRESS, sanitizeString((String) getInputParameter(ENDPOINT_ADDRESS)));
+        // We only sanitize the Envelope
         sanitizedInputs.put(ENVELOPE, sanitizeString((String) getInputParameter(ENVELOPE)));
-        sanitizedInputs.put(PORT_NAME, sanitizeString((String) getInputParameter(PORT_NAME)));
-        sanitizedInputs.put(SERVICE_NAME, sanitizeString((String) getInputParameter(SERVICE_NAME)));
-        sanitizedInputs.put(SERVICE_NS, sanitizeString((String) getInputParameter(SERVICE_NS)));
-        sanitizedInputs.put(PROXY_HOST, sanitizeString((String) getInputParameter(PROXY_HOST)));
-        sanitizedInputs.put(PROXY_PORT, sanitizeString((String) getInputParameter(PROXY_PORT)));
-        sanitizedInputs.put(PROXY_PROTOCOL, sanitizeString((String) getInputParameter(PROXY_PROTOCOL)));
-        sanitizedInputs.put(PROXY_USER, sanitizeString((String) getInputParameter(PROXY_USER)));
-        sanitizedInputs.put(PROXY_PASSWORD, sanitizeString((String) getInputParameter(PROXY_PASSWORD)));
-        // No need to sanitize the HTTP Headers
+
+        sanitizedInputs.put(PASSWORD, getInputParameter(PASSWORD));
+        sanitizedInputs.put(USER_NAME, getInputParameter(USER_NAME));
+        sanitizedInputs.put(BINDING, getInputParameter(BINDING));
+        sanitizedInputs.put(SOAP_ACTION, getInputParameter(SOAP_ACTION));
+        sanitizedInputs.put(ENDPOINT_ADDRESS, getInputParameter(ENDPOINT_ADDRESS));
+        sanitizedInputs.put(PORT_NAME, getInputParameter(PORT_NAME));
+        sanitizedInputs.put(SERVICE_NAME, getInputParameter(SERVICE_NAME));
+        sanitizedInputs.put(SERVICE_NS, getInputParameter(SERVICE_NS));
+        sanitizedInputs.put(PROXY_HOST, getInputParameter(PROXY_HOST));
+        sanitizedInputs.put(PROXY_PORT, getInputParameter(PROXY_PORT));
+        sanitizedInputs.put(PROXY_PROTOCOL,getInputParameter(PROXY_PROTOCOL));
+        sanitizedInputs.put(PROXY_USER, getInputParameter(PROXY_USER));
+        sanitizedInputs.put(PROXY_PASSWORD, getInputParameter(PROXY_PASSWORD));
         sanitizedInputs.put(HTTP_HEADERS, getInputParameter(HTTP_HEADERS));
-        // Booleans, no need to sanitize them
         sanitizedInputs.put(PRINT_REQUEST_AND_RESPONSE, getInputParameter(PRINT_REQUEST_AND_RESPONSE));
         sanitizedInputs.put(BUILD_RESPONSE_DOCUMENT_BODY, getInputParameter(BUILD_RESPONSE_DOCUMENT_BODY));
         sanitizedInputs.put(BUILD_RESPONSE_DOCUMENT_ENVELOPE, getInputParameter(BUILD_RESPONSE_DOCUMENT_ENVELOPE));
-        // Replace Inputs with sanitized version
         setInputParameters(sanitizedInputs);
     }
 

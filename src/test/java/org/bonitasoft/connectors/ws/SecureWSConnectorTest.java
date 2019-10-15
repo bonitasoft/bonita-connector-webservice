@@ -190,7 +190,7 @@ public class SecureWSConnectorTest {
         final long timeToWait = 2000; // in ms
 
         final List<String> timeoutList = Collections.singletonList(String.valueOf(timeout));
-        final Map<String, List<String>> requestHeaders = Collections.singletonMap("com.sun.xml.ws.request.timeout\u0019",
+        final Map<String, List<String>> requestHeaders = Collections.singletonMap("com.sun.xml.ws.request.timeout",
                 timeoutList);
 
         String request = "" +
@@ -202,9 +202,9 @@ public class SecureWSConnectorTest {
                 "    </spr:sayHi>" +
                 " </soapenv:Body>" +
                 "</soapenv:Envelope>";
-        final String result = execute(request, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/Hello\u0019Timeout",
-                "HelloWorld\u0019ImplService", "HelloWorld\u0019ImplPort",
-                "http://hello.cxf.ws.connectors.bonitasoft.org/\u0019", null, "guest\u0019", "guest\u0019", requestHeaders);
+        final String result = execute(request, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloTimeout",
+                "HelloWorldImplService", "HelloWorldImplPort",
+                "http://hello.cxf.ws.connectors.bonitasoft.org/", null, "guest", "guest", requestHeaders);
         assertThat(result).doesNotContain("");
         assertThat(result).contains("Hello Timeout");
     }
