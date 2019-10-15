@@ -185,7 +185,7 @@ public class SecureWSConnectorTest {
     }
 
     @Test
-    public void testReadTimeoutWithIllegalCharsOK() throws Exception {
+    public void should_sanitize_the_envelope_when_it_contains_illegal_chars() throws Exception {
         final long timeout = 10000; // in ms
         final long timeToWait = 2000; // in ms
 
