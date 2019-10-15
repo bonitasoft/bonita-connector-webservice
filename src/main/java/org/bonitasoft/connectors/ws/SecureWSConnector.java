@@ -282,7 +282,6 @@ public class SecureWSConnector extends AbstractConnector {
     private void sanitizeInputs() {
 
         Map<String, Object> sanitizedInputs = new HashMap<>();
-        sanitizedInputs.put(HTTP_HEADERS, sanitizeHTTPHeaders((List<List<Object>>) getInputParameter(HTTP_HEADERS)));
         sanitizedInputs.put(PASSWORD, sanitizeString((String) getInputParameter(PASSWORD)));
         sanitizedInputs.put(USER_NAME, sanitizeString((String) getInputParameter(USER_NAME)));
         sanitizedInputs.put(BINDING, sanitizeString((String) getInputParameter(BINDING)));
@@ -297,34 +296,14 @@ public class SecureWSConnector extends AbstractConnector {
         sanitizedInputs.put(PROXY_PROTOCOL, sanitizeString((String) getInputParameter(PROXY_PROTOCOL)));
         sanitizedInputs.put(PROXY_USER, sanitizeString((String) getInputParameter(PROXY_USER)));
         sanitizedInputs.put(PROXY_PASSWORD, sanitizeString((String) getInputParameter(PROXY_PASSWORD)));
-        //Booleans, no need to sanitize them
+        // No need to sanitize the HTTP Headers
+        sanitizedInputs.put(HTTP_HEADERS, getInputParameter(HTTP_HEADERS));
+        // Booleans, no need to sanitize them
         sanitizedInputs.put(PRINT_REQUEST_AND_RESPONSE, getInputParameter(PRINT_REQUEST_AND_RESPONSE));
         sanitizedInputs.put(BUILD_RESPONSE_DOCUMENT_BODY, getInputParameter(BUILD_RESPONSE_DOCUMENT_BODY));
         sanitizedInputs.put(BUILD_RESPONSE_DOCUMENT_ENVELOPE, getInputParameter(BUILD_RESPONSE_DOCUMENT_ENVELOPE));
         // Replace Inputs with sanitized version
         setInputParameters(sanitizedInputs);
-    }
-
-    private List<List<Object>> sanitizeHTTPHeaders(List<List<Object>> httpHeadersList) {
-        List<List<Object>> sanitizedHttpHeadersList = new ArrayList<>();
-        if (httpHeadersList != null) {
-            for (final List<Object> row : httpHeadersList) {
-                if (row.size() == 2) {
-                    final Object value = row.get(1);
-                    List<Object> sanitizedValue = new ArrayList<>();
-                    sanitizedValue.add(row.get(0));
-                    if (value instanceof Collection) {
-                        for (final Object parameter : (Collection<Object>) value) {
-                            sanitizedValue.add(Collections.singletonList(sanitizeString(parameter.toString())));
-                        }
-                    } else {
-                        sanitizedValue.add(Collections.singletonList(sanitizeString(value.toString())));
-                    }
-                    sanitizedHttpHeadersList.add(sanitizedValue);
-                }
-            }
-        }
-        return sanitizedHttpHeadersList;
     }
 
     private String sanitizeString(String stringToSanitize) {
