@@ -17,11 +17,7 @@ package org.bonitasoft.connectors.ws;
 import java.io.StringReader;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
@@ -42,6 +38,8 @@ import javax.xml.ws.Dispatch;
 import javax.xml.ws.Service;
 import javax.xml.ws.handler.MessageContext;
 
+import org.apache.commons.text.translate.LookupTranslator;
+import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connector.ConnectorException;
 import org.bonitasoft.engine.connector.ConnectorValidationException;
@@ -104,8 +102,45 @@ public class SecureWSConnector extends AbstractConnector {
 
     private Transformer transformer;
 
+    private LookupTranslator lookupTranslator;
+
     private Map<String, String> saveProxyConfiguration = new HashMap<>();
 
+    public SecureWSConnector() {
+        Map<CharSequence, CharSequence> escapeXml10Map = new HashMap<>();
+        escapeXml10Map.put("\u0000", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0001", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0002", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0003", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0004", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0005", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0006", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0007", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0008", StringUtils.EMPTY);
+        escapeXml10Map.put("\u000b", StringUtils.EMPTY);
+        escapeXml10Map.put("\u000c", StringUtils.EMPTY);
+        escapeXml10Map.put("\u000e", StringUtils.EMPTY);
+        escapeXml10Map.put("\u000f", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0010", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0011", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0012", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0013", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0014", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0015", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0016", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0017", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0018", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0019", StringUtils.EMPTY);
+        escapeXml10Map.put("\u001a", StringUtils.EMPTY);
+        escapeXml10Map.put("\u001b", StringUtils.EMPTY);
+        escapeXml10Map.put("\u001c", StringUtils.EMPTY);
+        escapeXml10Map.put("\u001d", StringUtils.EMPTY);
+        escapeXml10Map.put("\u001e", StringUtils.EMPTY);
+        escapeXml10Map.put("\u001f", StringUtils.EMPTY);
+        escapeXml10Map.put("\ufffe", StringUtils.EMPTY);
+        escapeXml10Map.put("\uffff", StringUtils.EMPTY);
+        lookupTranslator = new LookupTranslator(Collections.unmodifiableMap(escapeXml10Map));
+    }
     @Override
     public void validateInputParameters() throws ConnectorValidationException {
         final String serviceNS = (String) getInputParameter(SERVICE_NS);
@@ -138,7 +173,7 @@ public class SecureWSConnector extends AbstractConnector {
     @Override
     protected void executeBusinessLogic() throws ConnectorException {
         configureProxy();
-
+        sanitizeInputs();
         final String serviceNS = (String) getInputParameter(SERVICE_NS);
         LOGGER.info(SERVICE_NS + " " + serviceNS);
         final String serviceName = (String) getInputParameter(SERVICE_NAME);
@@ -242,6 +277,58 @@ public class SecureWSConnector extends AbstractConnector {
         setOutputParameter(OUTPUT_SOURCE_RESPONSE, sourceResponse);
         setOutputParameter(OUTPUT_RESPONSE_DOCUMENT_ENVELOPE, responseDocumentEnvelope);
         setOutputParameter(OUTPUT_RESPONSE_DOCUMENT_BODY, responseDocumentBody);
+    }
+
+    private void sanitizeInputs() {
+
+        Map<String, Object> sanitizedInputs = new HashMap<>();
+        sanitizedInputs.put(HTTP_HEADERS, sanitizeHTTPHeaders((List<List<Object>>) getInputParameter(HTTP_HEADERS)));
+        sanitizedInputs.put(PASSWORD, sanitizeString((String) getInputParameter(PASSWORD)));
+        sanitizedInputs.put(USER_NAME, sanitizeString((String) getInputParameter(USER_NAME)));
+        sanitizedInputs.put(BINDING, sanitizeString((String) getInputParameter(BINDING)));
+        sanitizedInputs.put(SOAP_ACTION, sanitizeString((String) getInputParameter(SOAP_ACTION)));
+        sanitizedInputs.put(ENDPOINT_ADDRESS, sanitizeString((String) getInputParameter(ENDPOINT_ADDRESS)));
+        sanitizedInputs.put(ENVELOPE, sanitizeString((String) getInputParameter(ENVELOPE)));
+        sanitizedInputs.put(PORT_NAME, sanitizeString((String) getInputParameter(PORT_NAME)));
+        sanitizedInputs.put(SERVICE_NAME, sanitizeString((String) getInputParameter(SERVICE_NAME)));
+        sanitizedInputs.put(SERVICE_NS, sanitizeString((String) getInputParameter(SERVICE_NS)));
+        sanitizedInputs.put(PROXY_HOST, sanitizeString((String) getInputParameter(PROXY_HOST)));
+        sanitizedInputs.put(PROXY_PORT, sanitizeString((String) getInputParameter(PROXY_PORT)));
+        sanitizedInputs.put(PROXY_PROTOCOL, sanitizeString((String) getInputParameter(PROXY_PROTOCOL)));
+        sanitizedInputs.put(PROXY_USER, sanitizeString((String) getInputParameter(PROXY_USER)));
+        sanitizedInputs.put(PROXY_PASSWORD, sanitizeString((String) getInputParameter(PROXY_PASSWORD)));
+        //Booleans, no need to sanitize them
+        sanitizedInputs.put(PRINT_REQUEST_AND_RESPONSE, getInputParameter(PRINT_REQUEST_AND_RESPONSE));
+        sanitizedInputs.put(BUILD_RESPONSE_DOCUMENT_BODY, getInputParameter(BUILD_RESPONSE_DOCUMENT_BODY));
+        sanitizedInputs.put(BUILD_RESPONSE_DOCUMENT_ENVELOPE, getInputParameter(BUILD_RESPONSE_DOCUMENT_ENVELOPE));
+        // Replace Inputs with sanitized version
+        setInputParameters(sanitizedInputs);
+    }
+
+    private List<List<Object>> sanitizeHTTPHeaders(List<List<Object>> httpHeadersList) {
+        List<List<Object>> sanitizedHttpHeadersList = new ArrayList<>();
+        if (httpHeadersList != null) {
+            for (final List<Object> row : httpHeadersList) {
+                if (row.size() == 2) {
+                    final Object value = row.get(1);
+                    List<Object> sanitizedValue = new ArrayList<>();
+                    sanitizedValue.add(row.get(0));
+                    if (value instanceof Collection) {
+                        for (final Object parameter : (Collection<Object>) value) {
+                            sanitizedValue.add(Collections.singletonList(sanitizeString(parameter.toString())));
+                        }
+                    } else {
+                        sanitizedValue.add(Collections.singletonList(sanitizeString(value.toString())));
+                    }
+                    sanitizedHttpHeadersList.add(sanitizedValue);
+                }
+            }
+        }
+        return sanitizedHttpHeadersList;
+    }
+
+    private String sanitizeString(String stringToSanitize) {
+        return lookupTranslator.translate(stringToSanitize);
     }
 
     private void restoreConfiguration() {
