@@ -173,7 +173,6 @@ public class SecureWSConnector extends AbstractConnector {
     @Override
     protected void executeBusinessLogic() throws ConnectorException {
         configureProxy();
-        sanitizeInputs();
         final String serviceNS = (String) getInputParameter(SERVICE_NS);
         LOGGER.info(SERVICE_NS + " " + serviceNS);
         final String serviceName = (String) getInputParameter(SERVICE_NAME);
@@ -231,7 +230,7 @@ public class SecureWSConnector extends AbstractConnector {
             dispatch.getRequestContext().put(MessageContext.HTTP_REQUEST_HEADERS, httpHeadersMap);
         }
 
-        final String envelope = (String) getInputParameter(ENVELOPE);
+        final String envelope = sanitizeString((String) getInputParameter(ENVELOPE));
         LOGGER.info(ENVELOPE + " " + envelope);
 
 
@@ -277,32 +276,6 @@ public class SecureWSConnector extends AbstractConnector {
         setOutputParameter(OUTPUT_SOURCE_RESPONSE, sourceResponse);
         setOutputParameter(OUTPUT_RESPONSE_DOCUMENT_ENVELOPE, responseDocumentEnvelope);
         setOutputParameter(OUTPUT_RESPONSE_DOCUMENT_BODY, responseDocumentBody);
-    }
-
-    private void sanitizeInputs() {
-
-        Map<String, Object> sanitizedInputs = new HashMap<>();
-        // We only sanitize the Envelope
-        sanitizedInputs.put(ENVELOPE, sanitizeString((String) getInputParameter(ENVELOPE)));
-
-        sanitizedInputs.put(PASSWORD, getInputParameter(PASSWORD));
-        sanitizedInputs.put(USER_NAME, getInputParameter(USER_NAME));
-        sanitizedInputs.put(BINDING, getInputParameter(BINDING));
-        sanitizedInputs.put(SOAP_ACTION, getInputParameter(SOAP_ACTION));
-        sanitizedInputs.put(ENDPOINT_ADDRESS, getInputParameter(ENDPOINT_ADDRESS));
-        sanitizedInputs.put(PORT_NAME, getInputParameter(PORT_NAME));
-        sanitizedInputs.put(SERVICE_NAME, getInputParameter(SERVICE_NAME));
-        sanitizedInputs.put(SERVICE_NS, getInputParameter(SERVICE_NS));
-        sanitizedInputs.put(PROXY_HOST, getInputParameter(PROXY_HOST));
-        sanitizedInputs.put(PROXY_PORT, getInputParameter(PROXY_PORT));
-        sanitizedInputs.put(PROXY_PROTOCOL,getInputParameter(PROXY_PROTOCOL));
-        sanitizedInputs.put(PROXY_USER, getInputParameter(PROXY_USER));
-        sanitizedInputs.put(PROXY_PASSWORD, getInputParameter(PROXY_PASSWORD));
-        sanitizedInputs.put(HTTP_HEADERS, getInputParameter(HTTP_HEADERS));
-        sanitizedInputs.put(PRINT_REQUEST_AND_RESPONSE, getInputParameter(PRINT_REQUEST_AND_RESPONSE));
-        sanitizedInputs.put(BUILD_RESPONSE_DOCUMENT_BODY, getInputParameter(BUILD_RESPONSE_DOCUMENT_BODY));
-        sanitizedInputs.put(BUILD_RESPONSE_DOCUMENT_ENVELOPE, getInputParameter(BUILD_RESPONSE_DOCUMENT_ENVELOPE));
-        setInputParameters(sanitizedInputs);
     }
 
     private String sanitizeString(String stringToSanitize) {
