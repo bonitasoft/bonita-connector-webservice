@@ -17,11 +17,7 @@ package org.bonitasoft.connectors.ws;
 import java.io.StringReader;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
@@ -42,6 +38,8 @@ import javax.xml.ws.Dispatch;
 import javax.xml.ws.Service;
 import javax.xml.ws.handler.MessageContext;
 
+import org.apache.commons.text.translate.LookupTranslator;
+import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connector.ConnectorException;
 import org.bonitasoft.engine.connector.ConnectorValidationException;
@@ -104,8 +102,45 @@ public class SecureWSConnector extends AbstractConnector {
 
     private Transformer transformer;
 
+    private LookupTranslator lookupTranslator;
+
     private Map<String, String> saveProxyConfiguration = new HashMap<>();
 
+    public SecureWSConnector() {
+        Map<CharSequence, CharSequence> escapeXml10Map = new HashMap<>();
+        escapeXml10Map.put("\u0000", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0001", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0002", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0003", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0004", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0005", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0006", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0007", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0008", StringUtils.EMPTY);
+        escapeXml10Map.put("\u000b", StringUtils.EMPTY);
+        escapeXml10Map.put("\u000c", StringUtils.EMPTY);
+        escapeXml10Map.put("\u000e", StringUtils.EMPTY);
+        escapeXml10Map.put("\u000f", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0010", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0011", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0012", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0013", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0014", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0015", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0016", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0017", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0018", StringUtils.EMPTY);
+        escapeXml10Map.put("\u0019", StringUtils.EMPTY);
+        escapeXml10Map.put("\u001a", StringUtils.EMPTY);
+        escapeXml10Map.put("\u001b", StringUtils.EMPTY);
+        escapeXml10Map.put("\u001c", StringUtils.EMPTY);
+        escapeXml10Map.put("\u001d", StringUtils.EMPTY);
+        escapeXml10Map.put("\u001e", StringUtils.EMPTY);
+        escapeXml10Map.put("\u001f", StringUtils.EMPTY);
+        escapeXml10Map.put("\ufffe", StringUtils.EMPTY);
+        escapeXml10Map.put("\uffff", StringUtils.EMPTY);
+        lookupTranslator = new LookupTranslator(Collections.unmodifiableMap(escapeXml10Map));
+    }
     @Override
     public void validateInputParameters() throws ConnectorValidationException {
         final String serviceNS = (String) getInputParameter(SERVICE_NS);
@@ -138,7 +173,6 @@ public class SecureWSConnector extends AbstractConnector {
     @Override
     protected void executeBusinessLogic() throws ConnectorException {
         configureProxy();
-
         final String serviceNS = (String) getInputParameter(SERVICE_NS);
         LOGGER.info(SERVICE_NS + " " + serviceNS);
         final String serviceName = (String) getInputParameter(SERVICE_NAME);
@@ -196,7 +230,7 @@ public class SecureWSConnector extends AbstractConnector {
             dispatch.getRequestContext().put(MessageContext.HTTP_REQUEST_HEADERS, httpHeadersMap);
         }
 
-        final String envelope = (String) getInputParameter(ENVELOPE);
+        final String envelope = sanitizeString((String) getInputParameter(ENVELOPE));
         LOGGER.info(ENVELOPE + " " + envelope);
 
 
@@ -242,6 +276,10 @@ public class SecureWSConnector extends AbstractConnector {
         setOutputParameter(OUTPUT_SOURCE_RESPONSE, sourceResponse);
         setOutputParameter(OUTPUT_RESPONSE_DOCUMENT_ENVELOPE, responseDocumentEnvelope);
         setOutputParameter(OUTPUT_RESPONSE_DOCUMENT_BODY, responseDocumentBody);
+    }
+
+    private String sanitizeString(String stringToSanitize) {
+        return lookupTranslator.translate(stringToSanitize);
     }
 
     private void restoreConfiguration() {

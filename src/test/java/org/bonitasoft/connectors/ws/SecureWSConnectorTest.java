@@ -184,6 +184,31 @@ public class SecureWSConnectorTest {
         assertThat(result).contains("Hello Timeout");
     }
 
+    @Test
+    public void should_sanitize_the_envelope_when_it_contains_illegal_chars() throws Exception {
+        final long timeout = 10000; // in ms
+        final long timeToWait = 2000; // in ms
+
+        final List<String> timeoutList = Collections.singletonList(String.valueOf(timeout));
+        final Map<String, List<String>> requestHeaders = Collections.singletonMap("com.sun.xml.ws.request.timeout",
+                timeoutList);
+
+        String request = "" +
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">" +
+                " <soapenv:Header/>" +
+                " <soapenv:Body>" +
+                "    <spr:say\u0019Hi>" +
+                "       <arg0>" + timeToWait + "</arg0>" +
+                "    </spr:sayHi>" +
+                " </soapenv:Body>" +
+                "</soapenv:Envelope>";
+        final String result = execute(request, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloTimeout",
+                "HelloWorldImplService", "HelloWorldImplPort",
+                "http://hello.cxf.ws.connectors.bonitasoft.org/", null, "guest", "guest", requestHeaders);
+        assertThat(result).doesNotContain("");
+        assertThat(result).contains("Hello Timeout");
+    }
+
     private String execute(final String request, final String binding, final String endpoint, final String service,
             final String port, final String ns,
             final String soapAction, final String username, final String password) throws Exception {
