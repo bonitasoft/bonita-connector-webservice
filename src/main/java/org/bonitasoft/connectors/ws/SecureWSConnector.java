@@ -17,9 +17,16 @@ package org.bonitasoft.connectors.ws;
 import java.io.StringReader;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.logging.Logger;
+
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -38,8 +45,8 @@ import javax.xml.ws.Dispatch;
 import javax.xml.ws.Service;
 import javax.xml.ws.handler.MessageContext;
 
-import org.apache.commons.text.translate.LookupTranslator;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.translate.LookupTranslator;
 import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connector.ConnectorException;
 import org.bonitasoft.engine.connector.ConnectorValidationException;
@@ -141,6 +148,7 @@ public class SecureWSConnector extends AbstractConnector {
         escapeXml10Map.put("\uffff", StringUtils.EMPTY);
         lookupTranslator = new LookupTranslator(Collections.unmodifiableMap(escapeXml10Map));
     }
+
     @Override
     public void validateInputParameters() throws ConnectorValidationException {
         final String serviceNS = (String) getInputParameter(SERVICE_NS);
@@ -230,14 +238,16 @@ public class SecureWSConnector extends AbstractConnector {
             dispatch.getRequestContext().put(MessageContext.HTTP_REQUEST_HEADERS, httpHeadersMap);
         }
 
-        final String envelope = sanitizeString((String) getInputParameter(ENVELOPE));
-        LOGGER.info(ENVELOPE + " " + envelope);
-
-
+        String initialEnvelope = (String) getInputParameter(ENVELOPE);
+        String sanitizedEnvelope = sanitizeString(initialEnvelope);
+        if (!Objects.equals(initialEnvelope, sanitizedEnvelope)) {
+            LOGGER.warning("Invalid XML characters have been detected in the envelope, they will be removed.");
+        }
+        LOGGER.info(ENVELOPE + " " + sanitizedEnvelope);
 
         final Source sourceResponse;
         try {
-            sourceResponse = dispatch.invoke(new StreamSource(new StringReader(envelope)));
+            sourceResponse = dispatch.invoke(new StreamSource(new StringReader(sanitizedEnvelope)));
         } catch (final Exception e) {
             throw new ConnectorException("Exception trying to call remote webservice", e);
         }
@@ -270,7 +280,8 @@ public class SecureWSConnector extends AbstractConnector {
             printRequestAndResponse = false;
         }
         if (printRequestAndResponse) {
-            printRequestAndResponse(sourceResponse, buildResponseDocumentEnvelope, buildResponseDocumentBody, responseDocumentEnvelope, responseDocumentBody);
+            printRequestAndResponse(sourceResponse, buildResponseDocumentEnvelope, buildResponseDocumentBody,
+                    responseDocumentEnvelope, responseDocumentBody);
         }
 
         setOutputParameter(OUTPUT_SOURCE_RESPONSE, sourceResponse);
@@ -294,7 +305,7 @@ public class SecureWSConnector extends AbstractConnector {
     }
 
     private void configureProxy() {
-        saveProxyConfiguration  = saveProxyConfiguration();
+        saveProxyConfiguration = saveProxyConfiguration();
         final String host = (String) getInputParameter(PROXY_HOST);
         if (host == null || host.isEmpty()) {
             return;
@@ -305,12 +316,12 @@ public class SecureWSConnector extends AbstractConnector {
         final String port = (String) getInputParameter(PROXY_PORT);
         LOGGER.info(PROXY_PORT + " " + port);
 
-        if(SOCKS.equals(protocol)){
+        if (SOCKS.equals(protocol)) {
             System.setProperty("socksProxyHost", host);
             LOGGER.info("Setting environment variable: socksProxyHost=" + host);
             System.setProperty("socksProxyPort", port);
             LOGGER.info("Setting environment variable: socksProxyPort=" + port);
-        }else{
+        } else {
             final String hostKey = String.format("%s.proxyHost", protocol.toLowerCase());
             System.setProperty(hostKey, host);
             LOGGER.info("Setting environment variable: " + hostKey + "=" + host);
@@ -380,7 +391,8 @@ public class SecureWSConnector extends AbstractConnector {
         return responseDocumentBody;
     }
 
-    private void printRequestAndResponse(Source sourceResponse, boolean buildResponseDocumentEnvelope, boolean buildResponseDocumentBody,
+    private void printRequestAndResponse(Source sourceResponse, boolean buildResponseDocumentEnvelope,
+            boolean buildResponseDocumentBody,
             Document responseDocumentEnvelope, Document responseDocumentBody) {
         try {
             getTransformer().transform(sourceResponse, new StreamResult(System.err));
