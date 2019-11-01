@@ -13,7 +13,7 @@
     <properties>
         <bonita.engine.version>7.9.4</bonita.engine.version>
         <cxf.version>2.4.0</cxf.version>
-        <spring.version>3.0.5.RELEASE</spring.version>
+        <spring.version>5.2.0.RELEASE</spring.version>
         <!-- Must match version used by Bonita -->
         <jaxb.version>2.2.7</jaxb.version>
     </properties>
