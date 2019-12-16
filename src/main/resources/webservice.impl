@@ -3,7 +3,7 @@
 
 	<definitionId>webservice</definitionId>
     <description>SOAP implementation based on javax.xml.ws</description>
-	<definitionVersion>1.0.1</definitionVersion>
+	<definitionVersion>1.1.0</definitionVersion>
 	<implementationClassname>org.bonitasoft.connectors.ws.SecureWSConnector</implementationClassname>
 	<implementationId>webservice-impl</implementationId>
 	<implementationVersion>$implementation.version$</implementationVersion>
