@@ -75,6 +75,8 @@ public class SecureWSConnector extends AbstractConnector {
 
     private static final String USER_NAME = "userName";
 
+    private static final String ONE_WAY_INVOKE = "oneWayInvoke";
+
     private static final String BUILD_RESPONSE_DOCUMENT_BODY = "buildResponseDocumentBody";
 
     private static final String BUILD_RESPONSE_DOCUMENT_ENVELOPE = "buildResponseDocumentEnvelope";
@@ -245,9 +247,18 @@ public class SecureWSConnector extends AbstractConnector {
         }
         LOGGER.info(ENVELOPE + " " + sanitizedEnvelope);
 
-        final Source sourceResponse;
+        Boolean oneWayInvoke = (Boolean) getInputParameter(ONE_WAY_INVOKE);
+        if (oneWayInvoke == null) {
+            oneWayInvoke = false;
+        }
+        Source sourceResponse = null;
         try {
-            sourceResponse = dispatch.invoke(new StreamSource(new StringReader(sanitizedEnvelope)));
+            Source message = new StreamSource(new StringReader(sanitizedEnvelope));
+            if (oneWayInvoke) {
+                dispatch.invokeOneWay(message);
+            } else {
+                sourceResponse = dispatch.invoke(message);
+            }
         } catch (final Exception e) {
             throw new ConnectorException("Exception trying to call remote webservice", e);
         }
@@ -266,7 +277,7 @@ public class SecureWSConnector extends AbstractConnector {
         }
         Document responseDocumentEnvelope = null;
 
-        if (buildResponseDocumentEnvelope || buildResponseDocumentBody) {
+        if (sourceResponse != null && (buildResponseDocumentEnvelope || buildResponseDocumentBody)) {
             responseDocumentEnvelope = buildResponseDocumentEnvelope(sourceResponse);
         }
         Document responseDocumentBody = null;
@@ -339,7 +350,8 @@ public class SecureWSConnector extends AbstractConnector {
 
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(user, password != null ? password.toCharArray() : "".toCharArray());
+                    return new PasswordAuthentication(user,
+                            password != null ? password.toCharArray() : "".toCharArray());
                 }
 
             });
