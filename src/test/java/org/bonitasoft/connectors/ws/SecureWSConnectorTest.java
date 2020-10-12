@@ -35,6 +35,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.ws.soap.SOAPBinding;
 
 import org.bonitasoft.engine.connector.ConnectorException;
+import org.bonitasoft.engine.connector.ConnectorValidationException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -79,6 +80,84 @@ public class SecureWSConnectorTest {
     @AfterClass
     public static void tearDown() throws Exception {
         server.stop();
+    }
+
+    @Test(expected = ConnectorValidationException.class)
+    public void should_throw_error_when_envelope_is_missing() throws Exception {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("binding", "");
+        parameters.put("endpointAddress", "");
+        parameters.put("serviceName", "");
+        parameters.put("portName", "");
+        parameters.put("serviceNS", "");
+        SecureWSConnector webservice = new SecureWSConnector();
+        webservice.setInputParameters(parameters);
+        webservice.validateInputParameters();
+    }
+
+    @Test(expected = ConnectorValidationException.class)
+    public void should_throw_error_when_binding_is_missing() throws Exception {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("envelope", "");
+        parameters.put("endpointAddress", "");
+        parameters.put("serviceName", "");
+        parameters.put("portName", "");
+        parameters.put("serviceNS", "");
+        SecureWSConnector webservice = new SecureWSConnector();
+        webservice.setInputParameters(parameters);
+        webservice.validateInputParameters();
+    }
+
+    @Test(expected = ConnectorValidationException.class)
+    public void should_throw_error_when_endpoint_is_missing() throws Exception {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("envelope", "");
+        parameters.put("binding", "");
+        parameters.put("serviceName", "");
+        parameters.put("portName", "");
+        parameters.put("serviceNS", "");
+        SecureWSConnector webservice = new SecureWSConnector();
+        webservice.setInputParameters(parameters);
+        webservice.validateInputParameters();
+    }
+
+    @Test(expected = ConnectorValidationException.class)
+    public void should_throw_error_when_serviceName_is_missing() throws Exception {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("envelope", "");
+        parameters.put("binding", "");
+        parameters.put("endpointAddress", "");
+        parameters.put("portName", "");
+        parameters.put("serviceNS", "");
+        SecureWSConnector webservice = new SecureWSConnector();
+        webservice.setInputParameters(parameters);
+        webservice.validateInputParameters();
+    }
+
+    @Test(expected = ConnectorValidationException.class)
+    public void should_throw_error_when_portName_is_missing() throws Exception {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("envelope", "");
+        parameters.put("binding", "");
+        parameters.put("endpointAddress", "");
+        parameters.put("serviceName", "");
+        parameters.put("serviceNS", "");
+        SecureWSConnector webservice = new SecureWSConnector();
+        webservice.setInputParameters(parameters);
+        webservice.validateInputParameters();
+    }
+
+    @Test(expected = ConnectorValidationException.class)
+    public void should_throw_error_when_serviceNs_is_missing() throws Exception {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("envelope", "");
+        parameters.put("binding", "");
+        parameters.put("endpointAddress", "");
+        parameters.put("serviceName", "");
+        parameters.put("portName", "");
+        SecureWSConnector webservice = new SecureWSConnector();
+        webservice.setInputParameters(parameters);
+        webservice.validateInputParameters();
     }
 
     @Test

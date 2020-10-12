@@ -170,27 +170,27 @@ public class SecureWSConnector extends AbstractConnector {
 
     @Override
     public void validateInputParameters() throws ConnectorValidationException {
-        final String serviceNS = (String) getInputParameter(SERVICE_NS);
+        String serviceNS = (String) getInputParameter(SERVICE_NS);
         if (serviceNS == null) {
             throw new ConnectorValidationException("Service NS is required");
         }
-        final String serviceName = (String) getInputParameter(SERVICE_NAME);
+        String serviceName = (String) getInputParameter(SERVICE_NAME);
         if (serviceName == null) {
             throw new ConnectorValidationException("Service Name is required");
         }
-        final String portName = (String) getInputParameter(PORT_NAME);
+        String portName = (String) getInputParameter(PORT_NAME);
         if (portName == null) {
             throw new ConnectorValidationException("Port Name is required");
         }
-        final String envelope = (String) getInputParameter(ENVELOPE);
+        String envelope = (String) getInputParameter(ENVELOPE);
         if (envelope == null) {
             throw new ConnectorValidationException("Envelope is required");
         }
-        final String endpointAddress = (String) getInputParameter(ENDPOINT_ADDRESS);
+        String endpointAddress = (String) getInputParameter(ENDPOINT_ADDRESS);
         if (endpointAddress == null) {
             throw new ConnectorValidationException("endpointAddress is required");
         }
-        final String binding = (String) getInputParameter(BINDING);
+        String binding = (String) getInputParameter(BINDING);
         if (binding == null) {
             throw new ConnectorValidationException("binding is required");
         }
@@ -447,7 +447,7 @@ public class SecureWSConnector extends AbstractConnector {
                 getTransformer().transform(new DOMSource(responseDocumentEnvelope), new StreamResult(os));
                 getTransformer().transform(new DOMSource(responseDocumentBody), new StreamResult(os));
             }
-            logger.info(os.toString());
+            logger.info(() -> os.toString());
         } catch (final TransformerException | IOException e) {
             logger.severe(e.getMessage());
         }
