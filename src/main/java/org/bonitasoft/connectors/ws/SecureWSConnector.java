@@ -312,14 +312,12 @@ public class SecureWSConnector extends AbstractConnector {
      */
     private Boolean getAndLogOptionalBooleanParameter(String parameterName) {
         Object value = getAndLogInputParameter(parameterName);
-        return value != null
-                ? (Boolean) value
-                : false;
+        return value != null && (Boolean) value;
     }
 
     private Object getAndLogInputParameter(String parameterName) {
         Object value = getInputParameter(parameterName);
-        logger.info(String.format("%s: %s", parameterName, value));
+        logger.info(() -> parameterName + ": " + value);
         return value;
     }
 
