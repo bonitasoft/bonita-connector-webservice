@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -34,6 +35,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.ws.soap.SOAPBinding;
 
 import org.bonitasoft.engine.connector.ConnectorException;
+import org.bonitasoft.engine.connector.ConnectorValidationException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -80,11 +82,89 @@ public class SecureWSConnectorTest {
         server.stop();
     }
 
+    @Test(expected = ConnectorValidationException.class)
+    public void should_throw_error_when_envelope_is_missing() throws Exception {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("binding", "");
+        parameters.put("endpointAddress", "");
+        parameters.put("serviceName", "");
+        parameters.put("portName", "");
+        parameters.put("serviceNS", "");
+        SecureWSConnector webservice = new SecureWSConnector();
+        webservice.setInputParameters(parameters);
+        webservice.validateInputParameters();
+    }
+
+    @Test(expected = ConnectorValidationException.class)
+    public void should_throw_error_when_binding_is_missing() throws Exception {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("envelope", "");
+        parameters.put("endpointAddress", "");
+        parameters.put("serviceName", "");
+        parameters.put("portName", "");
+        parameters.put("serviceNS", "");
+        SecureWSConnector webservice = new SecureWSConnector();
+        webservice.setInputParameters(parameters);
+        webservice.validateInputParameters();
+    }
+
+    @Test(expected = ConnectorValidationException.class)
+    public void should_throw_error_when_endpoint_is_missing() throws Exception {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("envelope", "");
+        parameters.put("binding", "");
+        parameters.put("serviceName", "");
+        parameters.put("portName", "");
+        parameters.put("serviceNS", "");
+        SecureWSConnector webservice = new SecureWSConnector();
+        webservice.setInputParameters(parameters);
+        webservice.validateInputParameters();
+    }
+
+    @Test(expected = ConnectorValidationException.class)
+    public void should_throw_error_when_serviceName_is_missing() throws Exception {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("envelope", "");
+        parameters.put("binding", "");
+        parameters.put("endpointAddress", "");
+        parameters.put("portName", "");
+        parameters.put("serviceNS", "");
+        SecureWSConnector webservice = new SecureWSConnector();
+        webservice.setInputParameters(parameters);
+        webservice.validateInputParameters();
+    }
+
+    @Test(expected = ConnectorValidationException.class)
+    public void should_throw_error_when_portName_is_missing() throws Exception {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("envelope", "");
+        parameters.put("binding", "");
+        parameters.put("endpointAddress", "");
+        parameters.put("serviceName", "");
+        parameters.put("serviceNS", "");
+        SecureWSConnector webservice = new SecureWSConnector();
+        webservice.setInputParameters(parameters);
+        webservice.validateInputParameters();
+    }
+
+    @Test(expected = ConnectorValidationException.class)
+    public void should_throw_error_when_serviceNs_is_missing() throws Exception {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("envelope", "");
+        parameters.put("binding", "");
+        parameters.put("endpointAddress", "");
+        parameters.put("serviceName", "");
+        parameters.put("portName", "");
+        SecureWSConnector webservice = new SecureWSConnector();
+        webservice.setInputParameters(parameters);
+        webservice.validateInputParameters();
+    }
+
     @Test
     public void testCustomer() throws Exception {
-
         String request = "" +
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:man=\"http://www.orangecaraibe.com/soa/v2/Interfaces/ManageCustomerOrderInternal\">" +
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:man=\"http://www.orangecaraibe.com/soa/v2/Interfaces/ManageCustomerOrderInternal\">"
+                +
                 "<soapenv:Header/>" +
                 "<soapenv:Body>" +
                 "  <man:executeStep>" +
@@ -104,8 +184,8 @@ public class SecureWSConnectorTest {
 
     @Test
     public void testBasicHTTPAuth() throws Exception {
-        String request =
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">" +
+        String request = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">"
+                +
                 " <soapenv:Header/>" +
                 " <soapenv:Body>" +
                 "    <spr:sayHi>" +
@@ -130,14 +210,14 @@ public class SecureWSConnectorTest {
         header.add(headerValue);
         requestHeaders.put(headerName, header);
 
-        String request =
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">"+
-                " <soapenv:Header/>"+
-                " <soapenv:Body>"+
-                "    <spr:sayHi>"+
-                "       <arg0>Rodrigue test</arg0>"+
-                "    </spr:sayHi>"+
-                " </soapenv:Body>"+
+        String request = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">"
+                +
+                " <soapenv:Header/>" +
+                " <soapenv:Body>" +
+                "    <spr:sayHi>" +
+                "       <arg0>Rodrigue test</arg0>" +
+                "    </spr:sayHi>" +
+                " </soapenv:Body>" +
                 "</soapenv:Envelope>";
         final String result = execute(request, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloHeader",
                 "HelloHeaderImplService", "HelloWorldImplPort",
@@ -160,7 +240,8 @@ public class SecureWSConnectorTest {
         requestHeaders.put(headerName, header);
 
         String request = "" +
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">" +
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">"
+                +
                 " <soapenv:Header/>" +
                 " <soapenv:Body>" +
                 "    <spr:sayHi>" +
@@ -186,7 +267,8 @@ public class SecureWSConnectorTest {
                 timeoutList);
 
         String request = "" +
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">" +
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">"
+                +
                 " <soapenv:Header/>" +
                 " <soapenv:Body>" +
                 "    <spr:sayHi>" +
@@ -210,7 +292,8 @@ public class SecureWSConnectorTest {
                 timeoutList);
 
         String request = "" +
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">" +
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">"
+                +
                 " <soapenv:Header/>" +
                 " <soapenv:Body>" +
                 "    <spr:say\u0019Hi>" +
@@ -221,8 +304,9 @@ public class SecureWSConnectorTest {
         final String result = execute(request, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloTimeout",
                 "HelloWorldImplService", "HelloWorldImplPort",
                 "http://hello.cxf.ws.connectors.bonitasoft.org/", null, "guest", "guest", requestHeaders);
-        assertThat(result).doesNotContain("");
-        assertThat(result).contains("Hello Timeout");
+        assertThat(result)
+                .doesNotContain("")
+                .contains("Hello Timeout");
     }
 
     private String execute(final String request, final String binding, final String endpoint, final String service,
