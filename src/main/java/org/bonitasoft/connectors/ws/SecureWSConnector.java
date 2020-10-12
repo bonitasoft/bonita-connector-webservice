@@ -185,98 +185,19 @@ public class SecureWSConnector extends AbstractConnector {
     @Override
     protected void executeBusinessLogic() throws ConnectorException {
         configureProxy();
-        final String serviceNS = (String) getInputParameter(SERVICE_NS);
-        logger.info(SERVICE_NS + " " + serviceNS);
-        final String serviceName = (String) getInputParameter(SERVICE_NAME);
-        logger.info(SERVICE_NAME + " " + serviceName);
-        final String portName = (String) getInputParameter(PORT_NAME);
-        logger.info(PORT_NAME + " " + portName);
-        final String binding = (String) getInputParameter(BINDING);
-        logger.info(BINDING + " " + binding);
-        final String endpointAddress = (String) getInputParameter(ENDPOINT_ADDRESS);
-        logger.info(ENDPOINT_ADDRESS + " " + endpointAddress);
 
-        final QName serviceQName = new QName(serviceNS, serviceName);
-        final QName portQName = new QName(serviceNS, portName);
-        final Service service = Service.create(serviceQName);
-        service.addPort(portQName, binding, endpointAddress);
+        Dispatch<Source> dispatch = createDispatch();
+        configureCredentials(dispatch);
+        configureSoapAction(dispatch);
+        configureHeaders(dispatch);
 
-        final Dispatch<Source> dispatch = service.createDispatch(portQName, Source.class, Service.Mode.MESSAGE);
-        dispatch.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endpointAddress);
-        final Object authUserName = getInputParameter(USER_NAME);
-        if (authUserName != null) {
-            logger.info(USER_NAME + " " + authUserName);
-            dispatch.getRequestContext().put(BindingProvider.USERNAME_PROPERTY, authUserName);
-            final Object authPassword = getInputParameter(PASSWORD);
-            logger.info(PASSWORD + " ********");
-            dispatch.getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, authPassword);
-        }
-
-        final String soapAction = (String) getInputParameter(SOAP_ACTION);
-        logger.info(SOAP_ACTION + " " + soapAction);
-
-        if (soapAction != null) {
-            dispatch.getRequestContext().put(BindingProvider.SOAPACTION_USE_PROPERTY, true);
-            dispatch.getRequestContext().put(BindingProvider.SOAPACTION_URI_PROPERTY, soapAction);
-        }
-
-        final List<List<Object>> httpHeadersList = (List<List<Object>>) getInputParameter(HTTP_HEADERS);
-
-        if (httpHeadersList != null) {
-            final Map<String, List<String>> httpHeadersMap = new HashMap<>();
-            for (final List<Object> row : httpHeadersList) {
-                if (row.size() == 2) {
-                    final List<String> parameters = new ArrayList<>();
-                    final Object value = row.get(1);
-                    if (value instanceof Collection) {
-                        for (final Object parameter : (Collection<Object>) value) {
-                            parameters.add(parameter.toString());
-                        }
-                    } else {
-                        parameters.add(value.toString());
-                    }
-                    httpHeadersMap.put((String) row.get(0), parameters);
-
-                }
-            }
-            dispatch.getRequestContext().put(MessageContext.HTTP_REQUEST_HEADERS, httpHeadersMap);
-        }
-
-        String initialEnvelope = (String) getInputParameter(ENVELOPE);
-        String sanitizedEnvelope = sanitizeString(initialEnvelope);
-        if (!Objects.equals(initialEnvelope, sanitizedEnvelope)) {
-            logger.warning("Invalid XML characters have been detected in the envelope, they will be removed.");
-        }
-        logger.info(ENVELOPE + " " + sanitizedEnvelope);
-
-        Boolean oneWayInvoke = (Boolean) getInputParameter(ONE_WAY_INVOKE);
-        if (oneWayInvoke == null) {
-            oneWayInvoke = false;
-        }
-        Source sourceResponse = null;
-        try {
-            Source message = new StreamSource(new StringReader(sanitizedEnvelope));
-            if (oneWayInvoke) {
-                dispatch.invokeOneWay(message);
-            } else {
-                sourceResponse = dispatch.invoke(message);
-            }
-        } catch (final Exception e) {
-            throw new ConnectorException("Exception trying to call remote webservice", e);
-        }
+        String sanitizedEnvelope = retrieveAndSanitizeEnvelope();
+        Source sourceResponse = invoke(dispatch, sanitizedEnvelope);
 
         restoreConfiguration();
 
-        Boolean buildResponseDocumentEnvelope = (Boolean) getInputParameter(BUILD_RESPONSE_DOCUMENT_ENVELOPE);
-        logger.info(BUILD_RESPONSE_DOCUMENT_ENVELOPE + " " + buildResponseDocumentEnvelope);
-        Boolean buildResponseDocumentBody = (Boolean) getInputParameter(BUILD_RESPONSE_DOCUMENT_BODY);
-        logger.info(BUILD_RESPONSE_DOCUMENT_BODY + " " + buildResponseDocumentBody);
-        if (buildResponseDocumentEnvelope == null) {
-            buildResponseDocumentEnvelope = false;
-        }
-        if (buildResponseDocumentBody == null) {
-            buildResponseDocumentBody = false;
-        }
+        Boolean buildResponseDocumentEnvelope = getAndLogOptionalBooleanParameter(BUILD_RESPONSE_DOCUMENT_ENVELOPE);
+        Boolean buildResponseDocumentBody = getAndLogOptionalBooleanParameter(BUILD_RESPONSE_DOCUMENT_BODY);
         Document responseDocumentEnvelope = null;
 
         if (sourceResponse != null && (buildResponseDocumentEnvelope || buildResponseDocumentBody)) {
@@ -287,14 +208,13 @@ public class SecureWSConnector extends AbstractConnector {
             responseDocumentBody = buildResponseDocumentBody(responseDocumentEnvelope);
         }
 
-        Boolean printRequestAndResponse = (Boolean) getInputParameter(PRINT_REQUEST_AND_RESPONSE);
-        logger.info(PRINT_REQUEST_AND_RESPONSE + " " + printRequestAndResponse);
-        if (printRequestAndResponse == null) {
-            printRequestAndResponse = false;
-        }
+        Boolean printRequestAndResponse = getAndLogOptionalBooleanParameter(PRINT_REQUEST_AND_RESPONSE);
         if (printRequestAndResponse) {
-            printRequestAndResponse(sourceResponse, buildResponseDocumentEnvelope, buildResponseDocumentBody,
-                    responseDocumentEnvelope, responseDocumentBody);
+            printRequestAndResponse(sourceResponse,
+                    buildResponseDocumentEnvelope,
+                    buildResponseDocumentBody,
+                    responseDocumentEnvelope,
+                    responseDocumentBody);
         }
 
         setOutputParameter(OUTPUT_SOURCE_RESPONSE, sourceResponse);
@@ -302,12 +222,113 @@ public class SecureWSConnector extends AbstractConnector {
         setOutputParameter(OUTPUT_RESPONSE_DOCUMENT_BODY, responseDocumentBody);
     }
 
+    private Dispatch<Source> createDispatch() {
+        String serviceNS = (String) getAndLogInputParameter(SERVICE_NS);
+        String serviceName = (String) getAndLogInputParameter(SERVICE_NAME);
+        String portName = (String) getAndLogInputParameter(PORT_NAME);
+        String binding = (String) getAndLogInputParameter(BINDING);
+        String endpointAddress = (String) getAndLogInputParameter(ENDPOINT_ADDRESS);
+
+        QName serviceQName = new QName(serviceNS, serviceName);
+        QName portQName = new QName(serviceNS, portName);
+        Service service = Service.create(serviceQName);
+        service.addPort(portQName, binding, endpointAddress);
+
+        Dispatch<Source> dispatch = service.createDispatch(portQName, Source.class, Service.Mode.MESSAGE);
+        dispatch.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endpointAddress);
+        return dispatch;
+    }
+
+    private Source invoke(Dispatch<Source> dispatch, String sanitizedEnvelope) throws ConnectorException {
+        Boolean oneWayInvoke = getAndLogOptionalBooleanParameter(ONE_WAY_INVOKE);
+        Source sourceResponse = null;
+        try {
+            Source message = new StreamSource(new StringReader(sanitizedEnvelope));
+            if (oneWayInvoke) {
+                dispatch.invokeOneWay(message);
+            } else {
+                sourceResponse = dispatch.invoke(message);
+            }
+        } catch (Exception e) {
+            throw new ConnectorException("Exception trying to call remote webservice", e);
+        }
+        return sourceResponse;
+    }
+
+    private String retrieveAndSanitizeEnvelope() {
+        String initialEnvelope = (String) getInputParameter(ENVELOPE);
+        String sanitizedEnvelope = sanitizeString(initialEnvelope);
+        if (!Objects.equals(initialEnvelope, sanitizedEnvelope)) {
+            logger.warning("Invalid XML characters have been detected in the envelope, they will be removed.");
+        }
+        logger.info(ENVELOPE + " " + sanitizedEnvelope);
+        return sanitizedEnvelope;
+    }
+
+    private void configureHeaders(Dispatch<Source> dispatch) {
+        List<List<Object>> httpHeadersList = (List<List<Object>>) getInputParameter(HTTP_HEADERS);
+        if (httpHeadersList != null) {
+            Map<String, List<String>> httpHeadersMap = new HashMap<>();
+            httpHeadersList.stream()
+                    .filter(row -> row.size() == 2)
+                    .forEach(row -> addHeader(httpHeadersMap, row));
+            dispatch.getRequestContext().put(MessageContext.HTTP_REQUEST_HEADERS, httpHeadersMap);
+        }
+    }
+
+    private void addHeader(Map<String, List<String>> httpHeadersMap, List<Object> headerRow) {
+        List<String> parameters = new ArrayList<>();
+        Object value = headerRow.get(1);
+        if (value instanceof Collection) {
+            ((Collection<Object>) value).stream()
+                    .map(Object::toString)
+                    .forEach(parameters::add);
+        } else {
+            parameters.add(value.toString());
+        }
+        httpHeadersMap.put((String) headerRow.get(0), parameters);
+    }
+
+    private void configureSoapAction(Dispatch<Source> dispatch) {
+        Object soapAction = getAndLogInputParameter(SOAP_ACTION);
+        if (soapAction != null) {
+            dispatch.getRequestContext().put(BindingProvider.SOAPACTION_USE_PROPERTY, true);
+            dispatch.getRequestContext().put(BindingProvider.SOAPACTION_URI_PROPERTY, soapAction);
+        }
+    }
+
+    private void configureCredentials(Dispatch<Source> dispatch) {
+        Object authUserName = getInputParameter(USER_NAME);
+        if (authUserName != null) {
+            logger.info(USER_NAME + " " + authUserName);
+            dispatch.getRequestContext().put(BindingProvider.USERNAME_PROPERTY, authUserName);
+            Object authPassword = getInputParameter(PASSWORD);
+            dispatch.getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, authPassword);
+        }
+    }
+
+    /**
+     * @return the Boolean value, or false if the value is null
+     */
+    private Boolean getAndLogOptionalBooleanParameter(String parameterName) {
+        Object value = getAndLogInputParameter(parameterName);
+        return value != null
+                ? (Boolean) value
+                : false;
+    }
+
+    private Object getAndLogInputParameter(String parameterName) {
+        Object value = getInputParameter(parameterName);
+        logger.info(String.format("%s: %s", parameterName, value));
+        return value;
+    }
+
     private String sanitizeString(String stringToSanitize) {
         return lookupTranslator.translate(stringToSanitize);
     }
 
     private void restoreConfiguration() {
-        for (final Entry<String, String> entry : saveProxyConfiguration.entrySet()) {
+        for (Entry<String, String> entry : saveProxyConfiguration.entrySet()) {
             if (entry.getValue() != null) {
                 System.setProperty(entry.getKey(), entry.getValue());
             } else {
@@ -319,15 +340,13 @@ public class SecureWSConnector extends AbstractConnector {
 
     private void configureProxy() {
         saveProxyConfiguration = saveProxyConfiguration();
-        final String host = (String) getInputParameter(PROXY_HOST);
+        String host = (String) getInputParameter(PROXY_HOST);
         if (host == null || host.isEmpty()) {
             return;
         }
         logger.info(PROXY_HOST + " " + host);
-        final String protocol = (String) getInputParameter(PROXY_PROTOCOL);
-        logger.info(PROXY_PROTOCOL + " " + protocol);
-        final String port = (String) getInputParameter(PROXY_PORT);
-        logger.info(PROXY_PORT + " " + port);
+        String protocol = (String) getAndLogInputParameter(PROXY_PROTOCOL);
+        String port = (String) getAndLogInputParameter(PROXY_PORT);
 
         if (SOCKS.equals(protocol)) {
             System.setProperty("socksProxyHost", host);
@@ -335,18 +354,16 @@ public class SecureWSConnector extends AbstractConnector {
             System.setProperty("socksProxyPort", port);
             logger.info("Setting environment variable: socksProxyPort=" + port);
         } else {
-            final String hostKey = String.format("%s.proxyHost", protocol.toLowerCase());
+            String hostKey = String.format("%s.proxyHost", protocol.toLowerCase());
             System.setProperty(hostKey, host);
             logger.info("Setting environment variable: " + hostKey + "=" + host);
-            final String portKey = String.format("%s.proxyPort", protocol.toLowerCase());
+            String portKey = String.format("%s.proxyPort", protocol.toLowerCase());
             System.setProperty(portKey, port);
             logger.info("Setting environment variable: " + portKey + "=" + port);
         }
 
-        final String user = (String) getInputParameter(PROXY_USER);
-        logger.info(PROXY_USER + " " + user);
-        final String password = (String) getInputParameter(PROXY_PASSWORD);
-        logger.info(PROXY_PASSWORD + " ********");
+        String user = (String) getAndLogInputParameter(PROXY_USER);
+        String password = (String) getInputParameter(PROXY_PASSWORD);
         if (user != null && !user.isEmpty()) {
             Authenticator.setDefault(new Authenticator() {
 
@@ -358,7 +375,6 @@ public class SecureWSConnector extends AbstractConnector {
 
             });
         }
-
     }
 
     private Map<String, String> saveProxyConfiguration() {

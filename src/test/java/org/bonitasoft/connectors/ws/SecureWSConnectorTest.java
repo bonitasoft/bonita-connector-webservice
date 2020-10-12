@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -82,9 +83,9 @@ public class SecureWSConnectorTest {
 
     @Test
     public void testCustomer() throws Exception {
-
         String request = "" +
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:man=\"http://www.orangecaraibe.com/soa/v2/Interfaces/ManageCustomerOrderInternal\">" +
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:man=\"http://www.orangecaraibe.com/soa/v2/Interfaces/ManageCustomerOrderInternal\">"
+                +
                 "<soapenv:Header/>" +
                 "<soapenv:Body>" +
                 "  <man:executeStep>" +
@@ -104,8 +105,8 @@ public class SecureWSConnectorTest {
 
     @Test
     public void testBasicHTTPAuth() throws Exception {
-        String request =
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">" +
+        String request = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">"
+                +
                 " <soapenv:Header/>" +
                 " <soapenv:Body>" +
                 "    <spr:sayHi>" +
@@ -130,14 +131,14 @@ public class SecureWSConnectorTest {
         header.add(headerValue);
         requestHeaders.put(headerName, header);
 
-        String request =
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">"+
-                " <soapenv:Header/>"+
-                " <soapenv:Body>"+
-                "    <spr:sayHi>"+
-                "       <arg0>Rodrigue test</arg0>"+
-                "    </spr:sayHi>"+
-                " </soapenv:Body>"+
+        String request = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">"
+                +
+                " <soapenv:Header/>" +
+                " <soapenv:Body>" +
+                "    <spr:sayHi>" +
+                "       <arg0>Rodrigue test</arg0>" +
+                "    </spr:sayHi>" +
+                " </soapenv:Body>" +
                 "</soapenv:Envelope>";
         final String result = execute(request, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloHeader",
                 "HelloHeaderImplService", "HelloWorldImplPort",
@@ -160,7 +161,8 @@ public class SecureWSConnectorTest {
         requestHeaders.put(headerName, header);
 
         String request = "" +
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">" +
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">"
+                +
                 " <soapenv:Header/>" +
                 " <soapenv:Body>" +
                 "    <spr:sayHi>" +
@@ -186,7 +188,8 @@ public class SecureWSConnectorTest {
                 timeoutList);
 
         String request = "" +
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">" +
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">"
+                +
                 " <soapenv:Header/>" +
                 " <soapenv:Body>" +
                 "    <spr:sayHi>" +
@@ -210,7 +213,8 @@ public class SecureWSConnectorTest {
                 timeoutList);
 
         String request = "" +
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">" +
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">"
+                +
                 " <soapenv:Header/>" +
                 " <soapenv:Body>" +
                 "    <spr:say\u0019Hi>" +
