@@ -447,7 +447,7 @@ public class SecureWSConnector extends AbstractConnector {
                 getTransformer().transform(new DOMSource(responseDocumentEnvelope), new StreamResult(os));
                 getTransformer().transform(new DOMSource(responseDocumentBody), new StreamResult(os));
             }
-            logger.info(() -> os.toString());
+            logger.info(os::toString);
         } catch (final TransformerException | IOException e) {
             logger.severe(e.getMessage());
         }
