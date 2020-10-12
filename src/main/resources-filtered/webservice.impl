@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<implementation:connectorImplementation
+    xmlns:implementation="http://www.bonitasoft.org/ns/connector/implementation/6.0">
+
+    <implementationId>${webservice.impl.id}</implementationId>
+    <implementationVersion>${webservice.impl.version}</implementationVersion>
+    <definitionId>${webservice.def.id}</definitionId>
+    <definitionVersion>${webservice.def.version}</definitionVersion>
+    <implementationClassname>${webservice.main-class}</implementationClassname>
+    <hasSources>false</hasSources>
+    <description>SOAP implementation based on javax.xml.ws</description>
+
+<!-- retrieved from the pom.xml at build time -->
+${connector-dependencies}
+
+</implementation:connectorImplementation>
