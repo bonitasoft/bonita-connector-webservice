@@ -182,7 +182,6 @@ public class SecureWSConnector extends AbstractConnector {
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void executeBusinessLogic() throws ConnectorException {
         configureProxy();
@@ -421,7 +420,7 @@ public class SecureWSConnector extends AbstractConnector {
                 getTransformer().transform(new DOMSource(responseDocumentBody), new StreamResult(System.err));
             }
         } catch (final TransformerException e) {
-            e.printStackTrace();
+            LOGGER.severe(e.getMessage());
         }
     }
 
