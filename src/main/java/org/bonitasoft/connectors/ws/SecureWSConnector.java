@@ -196,8 +196,8 @@ public class SecureWSConnector extends AbstractConnector {
 
         restoreConfiguration();
 
-        Boolean buildResponseDocumentEnvelope = getAndLogOptionalBooleanParameter(BUILD_RESPONSE_DOCUMENT_ENVELOPE);
-        Boolean buildResponseDocumentBody = getAndLogOptionalBooleanParameter(BUILD_RESPONSE_DOCUMENT_BODY);
+        boolean buildResponseDocumentEnvelope = getAndLogOptionalBooleanParameter(BUILD_RESPONSE_DOCUMENT_ENVELOPE);
+        boolean buildResponseDocumentBody = getAndLogOptionalBooleanParameter(BUILD_RESPONSE_DOCUMENT_BODY);
         Document responseDocumentEnvelope = null;
 
         if (sourceResponse != null && (buildResponseDocumentEnvelope || buildResponseDocumentBody)) {
@@ -208,7 +208,7 @@ public class SecureWSConnector extends AbstractConnector {
             responseDocumentBody = buildResponseDocumentBody(responseDocumentEnvelope);
         }
 
-        Boolean printRequestAndResponse = getAndLogOptionalBooleanParameter(PRINT_REQUEST_AND_RESPONSE);
+        boolean printRequestAndResponse = getAndLogOptionalBooleanParameter(PRINT_REQUEST_AND_RESPONSE);
         if (printRequestAndResponse) {
             printRequestAndResponse(sourceResponse,
                     buildResponseDocumentEnvelope,
@@ -240,7 +240,7 @@ public class SecureWSConnector extends AbstractConnector {
     }
 
     private Source invoke(Dispatch<Source> dispatch, String sanitizedEnvelope) throws ConnectorException {
-        Boolean oneWayInvoke = getAndLogOptionalBooleanParameter(ONE_WAY_INVOKE);
+        boolean oneWayInvoke = getAndLogOptionalBooleanParameter(ONE_WAY_INVOKE);
         Source sourceResponse = null;
         try {
             Source message = new StreamSource(new StringReader(sanitizedEnvelope));
@@ -310,9 +310,9 @@ public class SecureWSConnector extends AbstractConnector {
     /**
      * @return the Boolean value, or false if the value is null
      */
-    private Boolean getAndLogOptionalBooleanParameter(String parameterName) {
+    private boolean getAndLogOptionalBooleanParameter(String parameterName) {
         Object value = getAndLogInputParameter(parameterName);
-        return value != null && (Boolean) value;
+        return value != null && (boolean) value;
     }
 
     private Object getAndLogInputParameter(String parameterName) {
