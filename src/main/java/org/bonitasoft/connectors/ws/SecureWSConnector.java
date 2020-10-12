@@ -16,6 +16,8 @@
  */
 package org.bonitasoft.connectors.ws;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.StringReader;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
@@ -63,6 +65,18 @@ import org.w3c.dom.NodeList;
  * @author Matthieu Chaffotte
  */
 public class SecureWSConnector extends AbstractConnector {
+
+    private static final String HTTPS_PROXY_PORT = "https.proxyPort";
+
+    private static final String HTTPS_PROXY_HOST = "https.proxyHost";
+
+    private static final String HTTP_PROXY_PORT = "http.proxyPort";
+
+    private static final String HTTP_PROXY_HOST = "http.proxyHost";
+
+    private static final String SOCKS_PROXY_PORT = "socksProxyPort";
+
+    private static final String SOCKS_PROXY_HOST = "socksProxyHost";
 
     private static final String SOCKS = "SOCKS";
 
@@ -347,9 +361,9 @@ public class SecureWSConnector extends AbstractConnector {
         String port = (String) getAndLogInputParameter(PROXY_PORT);
 
         if (SOCKS.equals(protocol)) {
-            System.setProperty("socksProxyHost", host);
+            System.setProperty(SOCKS_PROXY_HOST, host);
             logger.info("Setting environment variable: socksProxyHost=" + host);
-            System.setProperty("socksProxyPort", port);
+            System.setProperty(SOCKS_PROXY_PORT, port);
             logger.info("Setting environment variable: socksProxyPort=" + port);
         } else {
             String hostKey = String.format("%s.proxyHost", protocol.toLowerCase());
@@ -377,12 +391,12 @@ public class SecureWSConnector extends AbstractConnector {
 
     private Map<String, String> saveProxyConfiguration() {
         final Map<String, String> configuration = new HashMap<>();
-        configuration.put("http.proxyHost", System.getProperty("http.proxyHost"));
-        configuration.put("http.proxyPort", System.getProperty("http.proxyPort"));
-        configuration.put("https.proxyHost", System.getProperty("https.proxyHost"));
-        configuration.put("https.proxyPort", System.getProperty("https.proxyPort"));
-        configuration.put("socksProxyHost", System.getProperty("socksProxyHost"));
-        configuration.put("socksProxyPort", System.getProperty("socksProxyPort"));
+        configuration.put(HTTP_PROXY_HOST, System.getProperty(HTTP_PROXY_HOST));
+        configuration.put(HTTP_PROXY_PORT, System.getProperty(HTTP_PROXY_PORT));
+        configuration.put(HTTPS_PROXY_HOST, System.getProperty(HTTPS_PROXY_HOST));
+        configuration.put(HTTPS_PROXY_PORT, System.getProperty(HTTPS_PROXY_PORT));
+        configuration.put(SOCKS_PROXY_HOST, System.getProperty(SOCKS_PROXY_HOST));
+        configuration.put(SOCKS_PROXY_PORT, System.getProperty(SOCKS_PROXY_PORT));
         return configuration;
     }
 
@@ -425,15 +439,16 @@ public class SecureWSConnector extends AbstractConnector {
     private void printRequestAndResponse(Source sourceResponse, boolean buildResponseDocumentEnvelope,
             boolean buildResponseDocumentBody,
             Document responseDocumentEnvelope, Document responseDocumentBody) {
-        try {
-            getTransformer().transform(sourceResponse, new StreamResult(System.err));
+        try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+            getTransformer().transform(sourceResponse, new StreamResult(os));
             if (buildResponseDocumentEnvelope) {
-                getTransformer().transform(new DOMSource(responseDocumentEnvelope), new StreamResult(System.err));
+                getTransformer().transform(new DOMSource(responseDocumentEnvelope), new StreamResult(os));
             } else if (buildResponseDocumentBody) {
-                getTransformer().transform(new DOMSource(responseDocumentEnvelope), new StreamResult(System.err));
-                getTransformer().transform(new DOMSource(responseDocumentBody), new StreamResult(System.err));
+                getTransformer().transform(new DOMSource(responseDocumentEnvelope), new StreamResult(os));
+                getTransformer().transform(new DOMSource(responseDocumentBody), new StreamResult(os));
             }
-        } catch (final TransformerException e) {
+            logger.info(os.toString());
+        } catch (final TransformerException | IOException e) {
             logger.severe(e.getMessage());
         }
     }

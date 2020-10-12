@@ -225,8 +225,9 @@ public class SecureWSConnectorTest {
         final String result = execute(request, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloTimeout",
                 "HelloWorldImplService", "HelloWorldImplPort",
                 "http://hello.cxf.ws.connectors.bonitasoft.org/", null, "guest", "guest", requestHeaders);
-        assertThat(result).doesNotContain("");
-        assertThat(result).contains("Hello Timeout");
+        assertThat(result)
+                .doesNotContain("")
+                .contains("Hello Timeout");
     }
 
     private String execute(final String request, final String binding, final String endpoint, final String service,
