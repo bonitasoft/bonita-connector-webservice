@@ -2,8 +2,8 @@
 <definition:ConnectorDefinition xmlns:definition="http://www.bonitasoft.org/ns/connector/definition/6.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<id>${webservice.def.id}</id>
 	<version>${webservice.def.version}</version>
-	<icon>ws.png</icon>
-	<category id="webservices" icon="ws.png" />
+	<icon>webservice.png</icon>
+	<category id="webservices" icon="webservice.png" />
 
 	<input name="serviceNS" type="java.lang.String" mandatory="true" />
 	<input name="serviceName" type="java.lang.String" mandatory="true" />
