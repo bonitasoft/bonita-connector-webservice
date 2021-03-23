@@ -9,22 +9,22 @@
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
         <fileSet>
-            <outputDirectory>/</outputDirectory>
+            <outputDirectory/>
             <directory>target/classes</directory>
             <includes>
                 <include>webservice.impl</include>
-                <include>/classpath</include>
+                <include>classpath</include>
             </includes>
         </fileSet>
         <fileSet>
-            <outputDirectory>/classpath</outputDirectory>
+            <outputDirectory>classpath</outputDirectory>
             <directory>${basedir}/target</directory>
             <includes>
                 <include>*-sources.jar</include>
             </includes>
         </fileSet>
         <fileSet>
-            <outputDirectory>/classpath</outputDirectory>
+            <outputDirectory>classpath</outputDirectory>
             <directory>${basedir}/target</directory>
             <includes>
                 <include>*:jar</include>
@@ -35,7 +35,7 @@
         <dependencySet>
             <unpack>false</unpack>
             <scope>runtime</scope>
-            <outputDirectory>/classpath</outputDirectory>
+            <outputDirectory>classpath</outputDirectory>
         </dependencySet>
     </dependencySets>
 </assembly>
