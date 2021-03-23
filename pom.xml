@@ -5,7 +5,7 @@
 
 	<groupId>org.bonitasoft.connectors</groupId>
 	<artifactId>bonita-connector-webservice</artifactId>
-	<version>1.3.3-SNAPSHOT</version>
+	<version>1.3.4-SNAPSHOT</version>
 
 	<name>Bonita Webservice Connector</name>
 	<description>Webservice Connector for Bonita</description>
