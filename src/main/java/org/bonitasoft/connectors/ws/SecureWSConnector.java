@@ -66,6 +66,8 @@ import org.w3c.dom.NodeList;
  */
 public class SecureWSConnector extends AbstractConnector {
 
+    private static final String KEY_VALUE_PATTERN = "%s: %s";
+
     private static final String HTTPS_PROXY_PORT = "https.proxyPort";
 
     private static final String HTTPS_PROXY_HOST = "https.proxyHost";
@@ -124,7 +126,7 @@ public class SecureWSConnector extends AbstractConnector {
 
     private static final String PROXY_PASSWORD = "proxyPassword";
 
-    private final Logger logger = Logger.getLogger(this.getClass().getName());
+    private static final Logger LOGGER = Logger.getLogger(SecureWSConnector.class.getName());
 
     private Transformer transformer;
 
@@ -228,28 +230,20 @@ public class SecureWSConnector extends AbstractConnector {
             }
             boolean printRequestAndResponse = getAndLogOptionalBooleanParameter(PRINT_REQUEST_AND_RESPONSE);
             if (printRequestAndResponse) {
-                try {
-                    printRequestAndResponse(newSourceFromDOM(result),
-                            buildResponseDocumentEnvelope,
-                            buildResponseDocumentBody,
-                            responseDocumentEnvelope,
-                            responseDocumentBody);
-                } catch (IOException e) {
-                    throw new ConnectorException(e);
-                }
+                printRequestAndResponse(newSourceFromDOM(result),
+                        buildResponseDocumentEnvelope,
+                        buildResponseDocumentBody,
+                        responseDocumentEnvelope,
+                        responseDocumentBody);
             }
-            try {
-                setOutputParameter(OUTPUT_SOURCE_RESPONSE, newSourceFromDOM(result));
-            } catch (IOException e) {
-                throw new ConnectorException(e);
-            }
+            setOutputParameter(OUTPUT_SOURCE_RESPONSE, newSourceFromDOM(result));
         }
         setOutputParameter(OUTPUT_RESPONSE_DOCUMENT_ENVELOPE,
                 buildResponseDocumentEnvelope ? responseDocumentEnvelope : null);
         setOutputParameter(OUTPUT_RESPONSE_DOCUMENT_BODY, buildResponseDocumentBody ? responseDocumentBody : null);
     }
 
-    private Source newSourceFromDOM(DOMResult result) throws IOException {
+    private Source newSourceFromDOM(DOMResult result) {
         return new DOMSource(result.getNode());
     }
 
@@ -290,13 +284,14 @@ public class SecureWSConnector extends AbstractConnector {
         String initialEnvelope = (String) getInputParameter(ENVELOPE);
         String sanitizedEnvelope = sanitizeString(initialEnvelope);
         if (!Objects.equals(initialEnvelope, sanitizedEnvelope)) {
-            logger.warning("Invalid XML characters have been detected in the envelope, they will be removed.");
+            LOGGER.warning("Invalid XML characters have been detected in the envelope, they will be removed.");
         }
-        logger.info(ENVELOPE + " " + sanitizedEnvelope);
+        LOGGER.info(() -> String.format(KEY_VALUE_PATTERN,ENVELOPE, sanitizedEnvelope));
         return sanitizedEnvelope;
     }
 
     private void configureHeaders(Dispatch<Source> dispatch) {
+        @SuppressWarnings("unchecked")
         List<List<Object>> httpHeadersList = (List<List<Object>>) getInputParameter(HTTP_HEADERS);
         if (httpHeadersList != null) {
             Map<String, List<String>> httpHeadersMap = new HashMap<>();
@@ -307,6 +302,7 @@ public class SecureWSConnector extends AbstractConnector {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void addHeader(Map<String, List<String>> httpHeadersMap, List<Object> headerRow) {
         List<String> parameters = new ArrayList<>();
         Object value = headerRow.get(1);
@@ -331,7 +327,7 @@ public class SecureWSConnector extends AbstractConnector {
     private void configureCredentials(Dispatch<Source> dispatch) {
         Object authUserName = getInputParameter(USER_NAME);
         if (authUserName != null) {
-            logger.info(USER_NAME + " " + authUserName);
+            LOGGER.info(() -> String.format(KEY_VALUE_PATTERN, USER_NAME, authUserName));
             dispatch.getRequestContext().put(BindingProvider.USERNAME_PROPERTY, authUserName);
             Object authPassword = getInputParameter(PASSWORD);
             dispatch.getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, authPassword);
@@ -348,7 +344,7 @@ public class SecureWSConnector extends AbstractConnector {
 
     private Object getAndLogInputParameter(String parameterName) {
         Object value = getInputParameter(parameterName);
-        logger.info(() -> parameterName + ": " + value);
+        LOGGER.info(() -> parameterName + ": " + value);
         return value;
     }
 
@@ -373,22 +369,22 @@ public class SecureWSConnector extends AbstractConnector {
         if (host == null || host.isEmpty()) {
             return;
         }
-        logger.info(PROXY_HOST + " " + host);
+        LOGGER.info(() -> String.format(KEY_VALUE_PATTERN, PROXY_HOST, host));
         String protocol = (String) getAndLogInputParameter(PROXY_PROTOCOL);
         String port = (String) getAndLogInputParameter(PROXY_PORT);
 
         if (SOCKS.equals(protocol)) {
             System.setProperty(SOCKS_PROXY_HOST, host);
-            logger.info("Setting environment variable: socksProxyHost=" + host);
+            LOGGER.info(() -> String.format("Setting environment variable: socksProxyHost=%s", host));
             System.setProperty(SOCKS_PROXY_PORT, port);
-            logger.info("Setting environment variable: socksProxyPort=" + port);
+            LOGGER.info(() -> String.format("Setting environment variable: socksProxyPort=%s", port));
         } else {
             String hostKey = String.format("%s.proxyHost", protocol.toLowerCase());
             System.setProperty(hostKey, host);
-            logger.info("Setting environment variable: " + hostKey + "=" + host);
+            LOGGER.info(() -> String.format("Setting environment variable: %s=%s", hostKey,host));
             String portKey = String.format("%s.proxyPort", protocol.toLowerCase());
             System.setProperty(portKey, port);
-            logger.info("Setting environment variable: " + portKey + "=" + port);
+            LOGGER.info(() -> String.format("Setting environment variable: %s=%s", portKey,port));
         }
 
         String user = (String) getAndLogInputParameter(PROXY_USER);
@@ -417,14 +413,9 @@ public class SecureWSConnector extends AbstractConnector {
         return configuration;
     }
 
-    private Document buildResponseDocumentEnvelope(DOMResult result) throws ConnectorException {
-        Document responseDocumentEnvelope;
-        if (result.getNode() instanceof Document) {
-            responseDocumentEnvelope = (Document) result.getNode();
-        } else {
-            responseDocumentEnvelope = result.getNode().getOwnerDocument();
-        }
-        return responseDocumentEnvelope;
+    private Document buildResponseDocumentEnvelope(DOMResult result) {
+        return result.getNode() instanceof Document ? 
+                (Document) result.getNode() : result.getNode().getOwnerDocument();
     }
 
     private Document buildResponseDocumentBody(Document responseDocumentEnvelope) throws ConnectorException {
@@ -458,9 +449,9 @@ public class SecureWSConnector extends AbstractConnector {
                 getTransformer().transform(new DOMSource(responseDocumentEnvelope), new StreamResult(os));
                 getTransformer().transform(new DOMSource(responseDocumentBody), new StreamResult(os));
             }
-            logger.info(os::toString);
+            LOGGER.info(os::toString);
         } catch (final TransformerException | IOException e) {
-            logger.severe(e.getMessage());
+            LOGGER.severe(e.getMessage());
         }
     }
 
