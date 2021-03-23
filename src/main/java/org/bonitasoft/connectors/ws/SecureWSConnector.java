@@ -213,27 +213,44 @@ public class SecureWSConnector extends AbstractConnector {
         boolean buildResponseDocumentEnvelope = getAndLogOptionalBooleanParameter(BUILD_RESPONSE_DOCUMENT_ENVELOPE);
         boolean buildResponseDocumentBody = getAndLogOptionalBooleanParameter(BUILD_RESPONSE_DOCUMENT_BODY);
         Document responseDocumentEnvelope = null;
-
-        if (sourceResponse != null && (buildResponseDocumentEnvelope || buildResponseDocumentBody)) {
-            responseDocumentEnvelope = buildResponseDocumentEnvelope(sourceResponse);
-        }
         Document responseDocumentBody = null;
-        if (buildResponseDocumentBody) {
-            responseDocumentBody = buildResponseDocumentBody(responseDocumentEnvelope);
-        }
 
-        boolean printRequestAndResponse = getAndLogOptionalBooleanParameter(PRINT_REQUEST_AND_RESPONSE);
-        if (printRequestAndResponse) {
-            printRequestAndResponse(sourceResponse,
-                    buildResponseDocumentEnvelope,
-                    buildResponseDocumentBody,
-                    responseDocumentEnvelope,
-                    responseDocumentBody);
+        if (sourceResponse != null) {
+            final DOMResult result = new DOMResult();
+            try {
+                getTransformer().transform(sourceResponse, result);
+            } catch (TransformerException e) {
+                throw new ConnectorException(e);
+            }
+            responseDocumentEnvelope = buildResponseDocumentEnvelope(result);
+            if (buildResponseDocumentBody) {
+                responseDocumentBody = buildResponseDocumentBody(responseDocumentEnvelope);
+            }
+            boolean printRequestAndResponse = getAndLogOptionalBooleanParameter(PRINT_REQUEST_AND_RESPONSE);
+            if (printRequestAndResponse) {
+                try {
+                    printRequestAndResponse(newSourceFromDOM(result),
+                            buildResponseDocumentEnvelope,
+                            buildResponseDocumentBody,
+                            responseDocumentEnvelope,
+                            responseDocumentBody);
+                } catch (IOException e) {
+                    throw new ConnectorException(e);
+                }
+            }
+            try {
+                setOutputParameter(OUTPUT_SOURCE_RESPONSE, newSourceFromDOM(result));
+            } catch (IOException e) {
+                throw new ConnectorException(e);
+            }
         }
+        setOutputParameter(OUTPUT_RESPONSE_DOCUMENT_ENVELOPE,
+                buildResponseDocumentEnvelope ? responseDocumentEnvelope : null);
+        setOutputParameter(OUTPUT_RESPONSE_DOCUMENT_BODY, buildResponseDocumentBody ? responseDocumentBody : null);
+    }
 
-        setOutputParameter(OUTPUT_SOURCE_RESPONSE, sourceResponse);
-        setOutputParameter(OUTPUT_RESPONSE_DOCUMENT_ENVELOPE, responseDocumentEnvelope);
-        setOutputParameter(OUTPUT_RESPONSE_DOCUMENT_BODY, responseDocumentBody);
+    private Source newSourceFromDOM(DOMResult result) throws IOException {
+        return new DOMSource(result.getNode());
     }
 
     private Dispatch<Source> createDispatch() {
@@ -400,14 +417,8 @@ public class SecureWSConnector extends AbstractConnector {
         return configuration;
     }
 
-    private Document buildResponseDocumentEnvelope(Source sourceResponse) throws ConnectorException {
-        final DOMResult result = new DOMResult();
+    private Document buildResponseDocumentEnvelope(DOMResult result) throws ConnectorException {
         Document responseDocumentEnvelope;
-        try {
-            getTransformer().transform(sourceResponse, result);
-        } catch (final TransformerException te) {
-            throw new ConnectorException(te);
-        }
         if (result.getNode() instanceof Document) {
             responseDocumentEnvelope = (Document) result.getNode();
         } else {

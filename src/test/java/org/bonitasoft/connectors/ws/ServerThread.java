@@ -22,11 +22,11 @@ public class ServerThread extends Thread {
 
     private static final Logger LOG = Logger.getLogger(ServerThread.class.getName());
 
-    private final org.mortbay.jetty.Server server;
+    private final org.eclipse.jetty.server.Server server;
 
     private boolean startFailed = false;
 
-    public ServerThread(final org.mortbay.jetty.Server server) {
+    public ServerThread(final  org.eclipse.jetty.server.Server server) {
         this.server = server;
     }
 

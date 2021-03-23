@@ -184,7 +184,7 @@ public class SecureWSConnectorTest {
 
     @Test
     public void testBasicHTTPAuth() throws Exception {
-        String request = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">"
+        String request = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.ws.connectors.bonitasoft.org/\">"
                 +
                 " <soapenv:Header/>" +
                 " <soapenv:Body>" +
@@ -195,7 +195,7 @@ public class SecureWSConnectorTest {
                 "</soapenv:Envelope>";
         final String response = execute(request, SOAPBinding.SOAP11HTTP_BINDING,
                 "http://localhost:9002/HelloWorld", "HelloWorldImplService",
-                "HelloWorldImplPort", "http://hello.cxf.ws.connectors.bonitasoft.org/", null, "guest", "guest");
+                "HelloWorldImplPort", "http://hello.ws.connectors.bonitasoft.org/", null, "guest", "guest");
         assertThat(response).as(response).contains("Rodrigue test");
     }
 
@@ -210,7 +210,7 @@ public class SecureWSConnectorTest {
         header.add(headerValue);
         requestHeaders.put(headerName, header);
 
-        String request = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">"
+        String request = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://helloHeader.ws.connectors.bonitasoft.org/\">"
                 +
                 " <soapenv:Header/>" +
                 " <soapenv:Body>" +
@@ -221,7 +221,7 @@ public class SecureWSConnectorTest {
                 "</soapenv:Envelope>";
         final String result = execute(request, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloHeader",
                 "HelloHeaderImplService", "HelloWorldImplPort",
-                "http://hello.cxf.ws.connectors.bonitasoft.org/", null, "guest", "guest", requestHeaders);
+                "http://helloHeader.ws.connectors.bonitasoft.org/", null, "guest", "guest", requestHeaders);
         assertThat(result).contains("Hello Rodrigue test");
     }
 
@@ -267,7 +267,7 @@ public class SecureWSConnectorTest {
                 timeoutList);
 
         String request = "" +
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">"
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://helloTimeout.ws.connectors.bonitasoft.org/\">"
                 +
                 " <soapenv:Header/>" +
                 " <soapenv:Body>" +
@@ -278,7 +278,7 @@ public class SecureWSConnectorTest {
                 "</soapenv:Envelope>";
         final String result = execute(request, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloTimeout",
                 "HelloWorldImplService", "HelloWorldImplPort",
-                "http://hello.cxf.ws.connectors.bonitasoft.org/", null, "guest", "guest", requestHeaders);
+                "http://helloTimeout.ws.connectors.bonitasoft.org/", null, "guest", "guest", requestHeaders);
         assertThat(result).contains("Hello Timeout");
     }
 
@@ -292,7 +292,7 @@ public class SecureWSConnectorTest {
                 timeoutList);
 
         String request = "" +
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://hello.cxf.ws.connectors.bonitasoft.org/\">"
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:spr=\"http://helloTimeout.ws.connectors.bonitasoft.org/\">"
                 +
                 " <soapenv:Header/>" +
                 " <soapenv:Body>" +
@@ -303,7 +303,7 @@ public class SecureWSConnectorTest {
                 "</soapenv:Envelope>";
         final String result = execute(request, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloTimeout",
                 "HelloWorldImplService", "HelloWorldImplPort",
-                "http://hello.cxf.ws.connectors.bonitasoft.org/", null, "guest", "guest", requestHeaders);
+                "http://helloTimeout.ws.connectors.bonitasoft.org/", null, "guest", "guest", requestHeaders);
         assertThat(result)
                 .doesNotContain("")
                 .contains("Hello Timeout");

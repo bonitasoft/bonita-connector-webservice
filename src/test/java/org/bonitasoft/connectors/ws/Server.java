@@ -16,18 +16,18 @@
  */
 package org.bonitasoft.connectors.ws;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 
-import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.handler.DefaultHandler;
-import org.mortbay.jetty.handler.HandlerCollection;
-import org.mortbay.jetty.nio.SelectChannelConnector;
-import org.mortbay.jetty.security.HashUserRealm;
-import org.mortbay.jetty.security.UserRealm;
-import org.mortbay.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.security.LoginService;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.webapp.WebAppContext;
 
 public class Server {
 
@@ -42,11 +42,7 @@ public class Server {
     }
 
     public Server(final int connectorPort) throws IOException {
-        final org.mortbay.jetty.Server server = new org.mortbay.jetty.Server();
-
-        final SelectChannelConnector connector = new SelectChannelConnector();
-        connector.setPort(connectorPort);
-        server.setConnectors(new Connector[] { connector });
+        final org.eclipse.jetty.server.Server server = new org.eclipse.jetty.server.Server(connectorPort);
 
         final WebAppContext webappcontext = new WebAppContext();
         webappcontext.setContextPath("/");
@@ -58,8 +54,11 @@ public class Server {
 
         server.setHandler(handlers);
 
-        final HashUserRealm myrealm = new HashUserRealm("MyRealm", "src/test/resources/org/bonitasoft/connectors/ws/realm.properties");
-        server.setUserRealms(new UserRealm[] { myrealm });
+        URL realmProps = Server.class.getResource("/org/bonitasoft/connectors/ws/realm.properties");
+        if (realmProps == null)
+            throw new FileNotFoundException("Unable to find realm.properties");
+        LoginService loginService = new HashLoginService("MyRealm", realmProps.toExternalForm());
+        server.addBean(loginService);
 
         thread = new ServerThread(server);
     }
@@ -72,7 +71,8 @@ public class Server {
         do {
             LOG.info("Waiting...");
             Thread.sleep(200);
-        } while (!thread.isServerStarted() && !thread.isStartFailed() && System.currentTimeMillis() < startTime + TIMEOUT);
+        } while (!thread.isServerStarted() && !thread.isStartFailed()
+                && System.currentTimeMillis() < startTime + TIMEOUT);
         if (System.currentTimeMillis() >= startTime + TIMEOUT) {
             throw new TimeoutException("Timeout starting the server");
         } else if (thread.isStartFailed()) {
