@@ -61,7 +61,7 @@
 
 		<!-- Test -->
 		<cxf.version>3.4.3</cxf.version>
-		<jetty.version>9.4.38.v20210224</jetty.version>
+		<jetty.version>9.4.43.v20210629</jetty.version>
 		<jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
 		<sonar-maven-plugin.version>3.7.0.1746</sonar-maven-plugin.version>
 
