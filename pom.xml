@@ -30,7 +30,7 @@
 
     <properties>
         <!-- Maven -->
-        <java.version>1.8</java.version>
+        <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.build.timestamp.format>yyyy.MM.dd-hh.mm</maven.build.timestamp.format>
@@ -56,14 +56,17 @@
         <jsr181.version>1.0-MR1</jsr181.version>
 
         <!-- Bonita -->
-        <bonita.engine.version>7.11.0</bonita.engine.version>
+        <bonita.engine.version>7.13.0</bonita.engine.version>
         <javax.activation.version>1.1</javax.activation.version>
 
         <!-- Test -->
         <cxf.version>3.4.5</cxf.version>
         <jetty.version>9.4.44.v20210927</jetty.version>
-        <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
-        <sonar-maven-plugin.version>3.7.0.1746</sonar-maven-plugin.version>
+        <assertj.version>3.22.0</assertj.version>
+        <junit.version>4.13.2</junit.version>
+        <logback.version>1.2.10</logback.version>
+        <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
+        <sonar-maven-plugin.version>3.9.1.2184</sonar-maven-plugin.version>
 
         <!-- Maven plugins -->
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
@@ -88,8 +91,8 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.bonitasoft.engine</groupId>
-                <artifactId>bonita-engine</artifactId>
+                <groupId>org.bonitasoft.runtime</groupId>
+                <artifactId>bonita-runtime-bom</artifactId>
                 <version>${bonita.engine.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
@@ -245,16 +248,19 @@
         <dependency>
             <artifactId>junit</artifactId>
             <groupId>junit</groupId>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
+            <version>${assertj.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

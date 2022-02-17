@@ -6,3 +6,5 @@ target
 .classpath
 /bin/
 *.DS_Store
+.mvn/wrapper/*.jar
+.vscode/
