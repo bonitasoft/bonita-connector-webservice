@@ -61,7 +61,7 @@ jobs:
         run: gpg -K
 
       - name: Publish package
-        run: ./mvnw --batch-mode deploy -Dgpg.passphrase=${{ secrets.gpg_passphrase }}
+        run: ./mvnw --batch-mode deploy -Pdeploy -Dgpg.passphrase=${{ secrets.gpg_passphrase }}
         env:
           MAVEN_USERNAME: ${{ secrets.ossrh_username }}
           MAVEN_PASSWORD: ${{ secrets.ossrh_password }}
