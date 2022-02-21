@@ -13,14 +13,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          java-version: 11
-          distribution: 'temurin'
-          cache: maven
+          fetch-depth: 0
 
       - name: Setup Java
         uses: actions/setup-java@v1
         with:
-          java-version: 8
+          java-version: 11
+          distribution: 'temurin'
+          cache: maven
       
       - name: Extract version
         shell: bash
