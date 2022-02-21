@@ -45,12 +45,12 @@ jobs:
             ${{ steps.Changelog.outputs.changelog }}
           draft: false
           prerelease: false
-
+          
       - name: Publish package
         run: ./mvnw --batch-mode deploy -Dgpg.passphrase=${{ secrets.gpg_passphrase }}
         env:
-          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+          MAVEN_USERNAME: ${{ secrets.ossrh_username }}
+          MAVEN_PASSWORD: ${{ secrets.ossrh_password }}
   
       - name: Upload Release Asset
         id: upload-release-asset 
