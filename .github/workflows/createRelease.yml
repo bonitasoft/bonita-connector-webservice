@@ -49,6 +49,13 @@ jobs:
           draft: false
           prerelease: false
 
+      name: Import GPG key
+        id: import_gpg
+        uses: crazy-max/ghaction-import-gpg@v4
+        with:
+          gpg_private_key: ${{ secrets.gpg_private_key }}
+          passphrase: ${{ secrets.gpg_passphrase }}
+
       - name: Publish package
         run: ./mvnw --batch-mode deploy -Dgpg.passphrase=${{ secrets.gpg_passphrase }}
         env:
