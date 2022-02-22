@@ -18,6 +18,7 @@ In order to create a new release:
 - On the release branch, make sure to update the pom version (remove the -SNAPSHOT)
 - Run the action 'Create release', set the version to releae as parameter
 - When the action is completed, do not forget to manage the release on the nexus (close and release)
+- Update the `master` with the next SNAPSHOT version.
 
 ## Contributing
 
