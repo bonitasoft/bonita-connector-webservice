@@ -1,4 +1,4 @@
 {
     "name": "bonita-connector-webservice",
-    "coment": "This json file is required by the generate-changelog-action, do not remove it."
+    "comment": "This json file is required by the generate-changelog-action, do not remove it."
 }
