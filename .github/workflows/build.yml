@@ -11,25 +11,46 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
        fetch-depth: 0
        
     - name: Setup Java
-      uses: actions/setup-java@v2
+      uses: actions/setup-java@v3
       with:
         java-version: 11
-        distribution: 'temurin' 
-        cache: maven
+        distribution: 'temurin'
+        cache: 'maven'
 
     - name: Build and test
       env:
         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
-      run: ./mvnw -B clean verify sonar:sonar -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-    - run: mkdir staging && cp target/*.zip staging
+      run: ./mvnw -B clean verify
+
+    - name: Check whether SONAR_TOKEN is set
+      id: is-sonar-set
+      env:
+        SONAR_IS_SET: ${{ secrets.SONAR_TOKEN }}
+      run: |
+        echo "Is Sonar Set: ${{ env.SONAR_IS_SET != '' }}"
+        echo "::set-output name=sonar-enable::${{ env.SONAR_IS_SET != '' }}"
+
+    - name: Run Sonar
+      if: ${{ steps.is-sonar-set.outputs.sonar-enable == 'true' }}
+      env:
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
+      run: ./mvnw -B sonar:sonar -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+
+    - name: Copy artifacts for staging
+      run: |
+        mkdir staging
+        cp target/*.zip staging
+        cp target/*.jar staging
+
     - name: Upload artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: Connectors
         path: staging
