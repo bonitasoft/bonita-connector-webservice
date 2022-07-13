@@ -49,7 +49,7 @@
         <jakarta.xml.ws-api.version>2.3.3</jakarta.xml.ws-api.version>
         <jaxws-rt.version>2.3.5</jaxws-rt.version>
         <jakarta.xml.bind-api.version>2.3.2</jakarta.xml.bind-api.version>
-        <stax-ex.version>1.8</stax-ex.version>
+        <stax-ex.version>2.1.0</stax-ex.version>
 
         <!-- Bonita -->
         <bonita.engine.version>7.13.0</bonita.engine.version>
@@ -60,7 +60,7 @@
         <jetty.version>9.4.44.v20210927</jetty.version>
         <assertj.version>3.22.0</assertj.version>
         <junit.version>4.13.2</junit.version>
-        <logback.version>1.2.10</logback.version>
+        <logback.version>1.2.11</logback.version>
         <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
         <sonar-maven-plugin.version>3.9.1.2184</sonar-maven-plugin.version>
 
@@ -70,7 +70,7 @@
         <maven-assembly-plugin.version>3.1.1</maven-assembly-plugin.version>
         <groovy-maven-plugin.version>2.1.1</groovy-maven-plugin.version>
         <groovy.version>3.0.11</groovy.version>
-        <maven-surefire-plugin.version>3.0.0-M6</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>3.0.0-M7</maven-surefire-plugin.version>
         <nexus-staging-maven-plugin.version>1.6.13</nexus-staging-maven-plugin.version>
         <maven-javadoc-plugin.version>3.4.0</maven-javadoc-plugin.version>
         <maven-source-plugin.version>3.2.0</maven-source-plugin.version>
