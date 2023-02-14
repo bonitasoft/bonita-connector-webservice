@@ -32,10 +32,9 @@ jobs:
       id: is-sonar-set
       env:
         SONAR_IS_SET: ${{ secrets.SONAR_TOKEN }}
-      run: |
+      run: |        
         echo "Is Sonar Set: ${{ env.SONAR_IS_SET != '' }}"
-        echo "::set-output name=sonar-enable::${{ env.SONAR_IS_SET != '' }}"
-
+        echo "sonar-enable=${{ env.SONAR_IS_SET != '' }}" >> $GITHUB_OUTPUT
     - name: Run Sonar
       if: ${{ steps.is-sonar-set.outputs.sonar-enable == 'true' }}
       env:
