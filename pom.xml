@@ -49,7 +49,7 @@
         <jakarta.xml.ws-api.version>2.3.3</jakarta.xml.ws-api.version>
         <jaxws-rt.version>2.3.5</jaxws-rt.version>
         <jakarta.xml.bind-api.version>2.3.2</jakarta.xml.bind-api.version>
-        <stax-ex.version>1.8</stax-ex.version>
+        <stax-ex.version>2.1.0</stax-ex.version>
 
         <!-- Bonita -->
         <bonita.engine.version>7.13.0</bonita.engine.version>
