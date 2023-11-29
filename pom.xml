@@ -52,7 +52,7 @@
         <stax-ex.version>1.8</stax-ex.version>
 
         <!-- Bonita -->
-        <bonita.engine.version>7.13.0</bonita.engine.version>
+        <bonita.engine.version>7.14.0</bonita.engine.version>
         <javax.activation.version>1.1</javax.activation.version>
 
         <!-- Test -->
@@ -60,20 +60,20 @@
         <jetty.version>9.4.44.v20210927</jetty.version>
         <assertj.version>3.23.1</assertj.version>
         <junit.version>4.13.2</junit.version>
-        <logback.version>1.2.11</logback.version>
+        <logback.version>1.2.12</logback.version>
         <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
         <sonar-maven-plugin.version>3.9.1.2184</sonar-maven-plugin.version>
 
         <!-- Maven plugins -->
-        <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <maven.compiler.release>${java.version}</maven.compiler.release>
-        <maven-assembly-plugin.version>3.1.1</maven-assembly-plugin.version>
+        <maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
         <groovy-maven-plugin.version>2.1.1</groovy-maven-plugin.version>
-        <groovy.version>3.0.11</groovy.version>
-        <maven-surefire-plugin.version>3.0.0-M7</maven-surefire-plugin.version>
+        <groovy.version>3.0.19</groovy.version>
+        <maven-surefire-plugin.version>3.2.2</maven-surefire-plugin.version>
         <nexus-staging-maven-plugin.version>1.6.13</nexus-staging-maven-plugin.version>
-        <maven-javadoc-plugin.version>3.4.0</maven-javadoc-plugin.version>
-        <maven-source-plugin.version>3.2.0</maven-source-plugin.version>
+        <maven-javadoc-plugin.version>3.6.2</maven-javadoc-plugin.version>
+        <maven-source-plugin.version>3.3.0</maven-source-plugin.version>
         <license-maven-plugin.version>4.1</license-maven-plugin.version>
 
         <!-- Sonar -->
@@ -110,7 +110,6 @@
         <dependency>
             <artifactId>bonita-common</artifactId>
             <groupId>org.bonitasoft.engine</groupId>
-            <version>${bonita.engine.version}</version>
             <scope>provided</scope>
         </dependency>
 
