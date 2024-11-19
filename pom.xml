@@ -57,7 +57,7 @@
 
         <!-- Test -->
         <cxf.version>3.5.4</cxf.version>
-        <jetty.version>9.4.51.v20230217</jetty.version>
+        <jetty.version>9.4.55.v20240627</jetty.version>
         <assertj.version>3.24.2</assertj.version>
         <junit.version>4.13.2</junit.version>
         <logback.version>1.2.13</logback.version>
