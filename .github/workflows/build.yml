@@ -8,39 +8,32 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
     - uses: actions/checkout@v4
       with:
        fetch-depth: 0
-       
+
     - name: Setup Java
       uses: actions/setup-java@v4
       with:
         java-version: 17
-        distribution: 'temurin'
-        cache: 'maven'
+        distribution: temurin
+        cache: maven
+
+    - name: Extract secrets from Keeper
+      uses: Keeper-Security/ksm-action@v1
+      with:
+        keeper-secret-config: ${{ secrets.KSM_CONFIG }}
+        secrets: |
+          ${{ vars.KEEPER_SONARCLOUD_RECORD_ID }}/field/password > env:SONAR_TOKEN
 
     - name: Build and test
       env:
         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-        SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
-      run: ./mvnw -B clean verify
-
-    - name: Check whether SONAR_TOKEN is set
-      id: is-sonar-set
-      env:
-        SONAR_IS_SET: ${{ secrets.SONAR_TOKEN }}
-      run: |        
-        echo "Is Sonar Set: ${{ env.SONAR_IS_SET != '' }}"
-        echo "sonar-enable=${{ env.SONAR_IS_SET != '' }}" >> $GITHUB_OUTPUT
-    - name: Run Sonar
-      if: ${{ steps.is-sonar-set.outputs.sonar-enable == 'true' }}
-      env:
-        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-        SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
-      run: ./mvnw -B sonar:sonar -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+        SONAR_TOKEN: ${{env.SONAR_TOKEN}}
+      run: ./mvnw -B clean verify sonar:sonar
 
     - name: Copy artifacts for staging
       run: |
