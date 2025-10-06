@@ -1,4 +1,4 @@
-# Webservice Connector
+it# Webservice Connector
 
 [![Actions Status](https://github.com/bonitasoft/bonita-connector-webservice/workflows/Build/badge.svg)](https://github.com/bonitasoft/bonita-connector-webservice/actions?query=workflow%3ABuild)
 [![Sonarcloud Status](https://sonarcloud.io/api/project_badges/measure?project=bonitasoft_bonita-connector-webservice&metric=alert_status)](https://sonarcloud.io/dashboard?id=bonitasoft_bonita-connector-webservice)
@@ -18,6 +18,8 @@ In order to create a new release:
 - On the release branch, make sure to update the pom version (remove the -SNAPSHOT)
 - Run the action 'Create release', set the version to release as parameter
 - Update the `master` with the next SNAPSHOT version.
+
+Once this is done, update the [Bonita marketplace repository](https://github.com/bonitasoft/bonita-marketplace) with the new version of the connector.
 
 ## Contributing
 
