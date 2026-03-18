@@ -1,0 +1,52 @@
+name: Claude Code Review
+
+on:
+  pull_request:
+    types: [ opened, labeled ]
+  issue_comment:
+    types: [ created ]
+
+jobs:
+  claude-review:
+    if: |
+      (
+        (github.event_name == 'pull_request' && github.event.action == 'opened') ||
+        (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '@claude review')) ||
+        (github.event_name == 'pull_request' && github.event.action == 'labeled' && github.event.label.name == 'ask-claude-review')
+      ) && github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: read
+      id-token: write
+    steps:
+      - name: Get PR number
+        id: pr-number
+        run: |
+          if [ "${{ github.event_name }}" == "issue_comment" ]; then
+            echo "pr_number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
+          else
+            echo "pr_number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+          fi
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+      - name: Run Claude Code Review
+        id: claude-review
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ORGANIZATION_ANTHROPIC_API_KEY }}
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ steps.pr-number.outputs.pr_number }}
+
+            Review this PR for code quality, bugs, performance, security, and test coverage. Use CLAUDE.md for guidance.
+
+            POST REVIEW BY UPDATING EXISTING COMMENT or CREATING NEW:
+            COMMENT_ID=$(gh pr view ${{ steps.pr-number.outputs.pr_number }} --json comments --jq '.comments[] | select(.body | contains("## Claude Code Review")) | .id' | head -1)
+            Start with "## Claude Code Review" header, add timestamp.
+            if [ -n "$COMMENT_ID" ]; then gh pr comment ${{ steps.pr-number.outputs.pr_number }} --edit-last --body "<review>"; else gh pr comment ${{ steps.pr-number.outputs.pr_number }} --body "<review>"; fi
+            Never create duplicate review comments.
+          claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*)"'
