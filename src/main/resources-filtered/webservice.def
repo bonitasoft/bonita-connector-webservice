@@ -31,6 +31,9 @@
 	<output name="responseDocumentEnvelope" type="org.w3c.dom.Document" />
 	<output name="responseDocumentBody" type="org.w3c.dom.Document" />
 	<output name="sourceResponse" type="javax.xml.transform.Source" />
+	<output name="codeResponse" type="java.lang.Integer" />
+	<output name="errorMessageResponse" type="java.lang.String" />
+
 
 	<page id="connection_information">
 		<widget id="userName" inputName="userName" xsi:type="definition:Text" />

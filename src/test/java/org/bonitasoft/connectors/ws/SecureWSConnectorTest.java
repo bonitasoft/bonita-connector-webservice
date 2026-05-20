@@ -250,11 +250,13 @@ public class SecureWSConnectorTest {
                 " </soapenv:Body>" +
                 "</soapenv:Envelope>";
 
-        expectedException.expect(ConnectorException.class);
+        //expectedException.expect(ConnectorException.class);
 
-        execute(request, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloHeader",
+        final String result = execute(request, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloHeader",
                 "HelloHeaderImplService", "HelloWorldImplPort",
                 "http://hello.cxf.ws.connectors.bonitasoft.org/", null, "guest", "guest", requestHeaders);
+
+        assertThat(result).contains("TestName value is not equals to testValue: testValue2");
     }
 
     @Test
@@ -366,9 +368,12 @@ public class SecureWSConnectorTest {
         final Map<String, Object> outputs = webservice.execute();
 
         final Source response = (Source) outputs.get("sourceResponse");
-        final String resultAsString = parse(response);
-        printResponse(resultAsString);
-        return resultAsString;
+        if (response != null) {
+	        final String resultAsString = parse(response);
+	        printResponse(resultAsString);
+	        return resultAsString;
+        }
+        return (String) outputs.get("errorMessageResponse");
     }
 
     private String parse(final Source response) throws TransformerFactoryConfigurationError, TransformerException {

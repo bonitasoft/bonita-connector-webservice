@@ -49,9 +49,11 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Dispatch;
 import javax.xml.ws.Service;
 import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.translate.LookupTranslator;
+import org.bonitasoft.connectors.ws.model.Response;
 import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connector.ConnectorException;
 import org.bonitasoft.engine.connector.ConnectorValidationException;
@@ -86,7 +88,11 @@ public class SecureWSConnector extends AbstractConnector {
 
     private static final String OUTPUT_RESPONSE_DOCUMENT_ENVELOPE = "responseDocumentEnvelope";
 
-    private static final String OUTPUT_SOURCE_RESPONSE = "sourceResponse";
+	private static final String OUTPUT_SOURCE_RESPONSE = "sourceResponse";
+
+	private static final String OUTPUT_RESPONSE_CODE = "codeResponse";
+
+    private static final String OUTPUT_RESPONSE_ERROR_MESSAGE = "errorMessageResponse";
 
     private static final String PRINT_REQUEST_AND_RESPONSE = "printRequestAndResponse";
 
@@ -208,7 +214,8 @@ public class SecureWSConnector extends AbstractConnector {
         configureHeaders(dispatch);
 
         String sanitizedEnvelope = retrieveAndSanitizeEnvelope();
-        Source sourceResponse = invoke(dispatch, sanitizedEnvelope);
+        Response response = invoke(dispatch, sanitizedEnvelope);
+        Source sourceResponse = response.getSource();
 
         restoreConfiguration();
 
@@ -241,6 +248,8 @@ public class SecureWSConnector extends AbstractConnector {
         setOutputParameter(OUTPUT_RESPONSE_DOCUMENT_ENVELOPE,
                 buildResponseDocumentEnvelope ? responseDocumentEnvelope : null);
         setOutputParameter(OUTPUT_RESPONSE_DOCUMENT_BODY, buildResponseDocumentBody ? responseDocumentBody : null);
+		setOutputParameter(OUTPUT_RESPONSE_CODE, response.getCode());
+		setOutputParameter(OUTPUT_RESPONSE_ERROR_MESSAGE, response.getErrorMessage());
     }
 
     private Source newSourceFromDOM(DOMResult result) {
@@ -264,9 +273,10 @@ public class SecureWSConnector extends AbstractConnector {
         return dispatch;
     }
 
-    private Source invoke(Dispatch<Source> dispatch, String sanitizedEnvelope) throws ConnectorException {
+    private Response invoke(Dispatch<Source> dispatch, String sanitizedEnvelope) throws ConnectorException {
         boolean oneWayInvoke = getAndLogOptionalBooleanParameter(ONE_WAY_INVOKE);
         Source sourceResponse = null;
+        String errorMessage = null;
         try {
             Source message = new StreamSource(new StringReader(sanitizedEnvelope));
             if (oneWayInvoke) {
@@ -274,10 +284,16 @@ public class SecureWSConnector extends AbstractConnector {
             } else {
                 sourceResponse = dispatch.invoke(message);
             }
+		} catch (SOAPFaultException e) {
+			errorMessage = e.getMessage();
+			String logTrace = String.format("%s response status is not successful: %s", sanitizedEnvelope,
+					errorMessage);
+			LOGGER.warning(logTrace);
         } catch (Exception e) {
             throw new ConnectorException("Exception trying to call remote webservice", e);
         }
-        return sourceResponse;
+		int responseCode = (int) (dispatch.getResponseContext().get(MessageContext.HTTP_RESPONSE_CODE));
+		return new Response(responseCode, sourceResponse, errorMessage);
     }
 
     private String retrieveAndSanitizeEnvelope() {
