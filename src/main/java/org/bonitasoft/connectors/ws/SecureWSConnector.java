@@ -196,13 +196,23 @@ public class SecureWSConnector extends AbstractConnector {
         if (binding == null) {
             throw new ConnectorValidationException("binding is required");
         }
+        String proxyHost = (String) getInputParameter(PROXY_HOST);
+        if (proxyHost != null && !proxyHost.isEmpty()) {
+            if (StringUtils.isEmpty((String) getInputParameter(PROXY_PROTOCOL))) {
+                throw new ConnectorValidationException("proxyProtocol is required when proxyHost is set");
+            }
+            if (StringUtils.isEmpty((String) getInputParameter(PROXY_PORT))) {
+                throw new ConnectorValidationException("proxyPort is required when proxyHost is set");
+            }
+        }
     }
 
     @Override
     protected void executeBusinessLogic() throws ConnectorException {
         Source sourceResponse;
-        configureProxy();
         try {
+            // inside the try: configureProxy may fail after writing a first system property
+            configureProxy();
             Dispatch<Source> dispatch = createDispatch();
             configureCredentials(dispatch);
             configureSoapAction(dispatch);
