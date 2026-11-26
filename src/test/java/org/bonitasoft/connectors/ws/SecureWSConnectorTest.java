@@ -17,6 +17,7 @@
 package org.bonitasoft.connectors.ws;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -32,18 +33,13 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.ws.soap.SOAPBinding;
+import jakarta.xml.ws.soap.SOAPBinding;
 
 import org.bonitasoft.engine.connector.ConnectorException;
 import org.bonitasoft.engine.connector.ConnectorValidationException;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.TestRule;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class SecureWSConnectorTest {
 
@@ -51,38 +47,19 @@ public class SecureWSConnectorTest {
 
     private static final Logger LOG = Logger.getLogger(SecureWSConnectorTest.class.getName());
 
-    @Rule
-    public TestRule testWatcher = new TestWatcher() {
 
-        @Override
-        public void starting(final Description d) {
-            LOG.info("==== Starting test: " + SecureWSConnectorTest.class.getName() + "." + d.getMethodName() + "() ====");
-        }
-
-        @Override
-        public void failed(final Throwable e, final Description d) {
-            LOG.info("==== Failed test: " + SecureWSConnectorTest.class.getName() + "." + d.getMethodName() + "() ====");
-        }
-
-        @Override
-        public void succeeded(final Description d) {
-            LOG.info("==== Succeeded test: " + SecureWSConnectorTest.class.getName() + "." + d.getMethodName() + "() ====");
-        }
-
-    };
-
-    @BeforeClass
+    @BeforeAll
     public static void setUp() throws Exception {
         server = new Server(9002);
         server.start();
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDown() throws Exception {
         server.stop();
     }
 
-    @Test(expected = ConnectorValidationException.class)
+    @Test
     public void should_throw_error_when_envelope_is_missing() throws Exception {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("binding", "");
@@ -92,10 +69,10 @@ public class SecureWSConnectorTest {
         parameters.put("serviceNS", "");
         SecureWSConnector webservice = new SecureWSConnector();
         webservice.setInputParameters(parameters);
-        webservice.validateInputParameters();
+        assertThrows(ConnectorValidationException.class, webservice::validateInputParameters);
     }
 
-    @Test(expected = ConnectorValidationException.class)
+    @Test
     public void should_throw_error_when_binding_is_missing() throws Exception {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("envelope", "");
@@ -105,10 +82,10 @@ public class SecureWSConnectorTest {
         parameters.put("serviceNS", "");
         SecureWSConnector webservice = new SecureWSConnector();
         webservice.setInputParameters(parameters);
-        webservice.validateInputParameters();
+        assertThrows(ConnectorValidationException.class, webservice::validateInputParameters);
     }
 
-    @Test(expected = ConnectorValidationException.class)
+    @Test
     public void should_throw_error_when_endpoint_is_missing() throws Exception {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("envelope", "");
@@ -118,10 +95,10 @@ public class SecureWSConnectorTest {
         parameters.put("serviceNS", "");
         SecureWSConnector webservice = new SecureWSConnector();
         webservice.setInputParameters(parameters);
-        webservice.validateInputParameters();
+        assertThrows(ConnectorValidationException.class, webservice::validateInputParameters);
     }
 
-    @Test(expected = ConnectorValidationException.class)
+    @Test
     public void should_throw_error_when_serviceName_is_missing() throws Exception {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("envelope", "");
@@ -131,10 +108,10 @@ public class SecureWSConnectorTest {
         parameters.put("serviceNS", "");
         SecureWSConnector webservice = new SecureWSConnector();
         webservice.setInputParameters(parameters);
-        webservice.validateInputParameters();
+        assertThrows(ConnectorValidationException.class, webservice::validateInputParameters);
     }
 
-    @Test(expected = ConnectorValidationException.class)
+    @Test
     public void should_throw_error_when_portName_is_missing() throws Exception {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("envelope", "");
@@ -144,10 +121,10 @@ public class SecureWSConnectorTest {
         parameters.put("serviceNS", "");
         SecureWSConnector webservice = new SecureWSConnector();
         webservice.setInputParameters(parameters);
-        webservice.validateInputParameters();
+        assertThrows(ConnectorValidationException.class, webservice::validateInputParameters);
     }
 
-    @Test(expected = ConnectorValidationException.class)
+    @Test
     public void should_throw_error_when_serviceNs_is_missing() throws Exception {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("envelope", "");
@@ -157,7 +134,7 @@ public class SecureWSConnectorTest {
         parameters.put("portName", "");
         SecureWSConnector webservice = new SecureWSConnector();
         webservice.setInputParameters(parameters);
-        webservice.validateInputParameters();
+        assertThrows(ConnectorValidationException.class, webservice::validateInputParameters);
     }
 
     @Test
@@ -225,8 +202,6 @@ public class SecureWSConnectorTest {
         assertThat(result).contains("Hello Rodrigue test");
     }
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void testHTTPHeaderKO() throws Exception {
@@ -250,11 +225,11 @@ public class SecureWSConnectorTest {
                 " </soapenv:Body>" +
                 "</soapenv:Envelope>";
 
-        expectedException.expect(ConnectorException.class);
-
-        execute(request, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloHeader",
+        ConnectorException exception = assertThrows(ConnectorException.class, () -> execute(request, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloHeader",
                 "HelloHeaderImplService", "HelloWorldImplPort",
-                "http://hello.cxf.ws.connectors.bonitasoft.org/", null, "guest", "guest", requestHeaders);
+                "http://hello.cxf.ws.connectors.bonitasoft.org/", null, "guest", "guest", requestHeaders));
+        // the SOAP fault raised by the server on the wrong header, not any other failure
+        assertThat(exception.getCause()).hasMessageContaining("TestName value is not equals to testValue: testValue2");
     }
 
     @Test

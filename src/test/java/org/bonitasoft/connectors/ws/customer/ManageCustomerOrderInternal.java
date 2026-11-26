@@ -16,10 +16,10 @@
  */
 package org.bonitasoft.connectors.ws.customer;
 
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebResult;
-import javax.jws.WebService;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebResult;
+import jakarta.jws.WebService;
 
 @WebService(targetNamespace = "http://www.orangecaraibe.com/soa/v2/Interfaces/ManageCustomerOrderInternal", name = "ManageCustomerOrderInternal")
 public interface ManageCustomerOrderInternal {

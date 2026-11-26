@@ -45,10 +45,10 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.Service;
-import javax.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Dispatch;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.handler.MessageContext;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.translate.LookupTranslator;
@@ -196,21 +196,34 @@ public class SecureWSConnector extends AbstractConnector {
         if (binding == null) {
             throw new ConnectorValidationException("binding is required");
         }
+        String proxyHost = (String) getInputParameter(PROXY_HOST);
+        if (proxyHost != null && !proxyHost.isEmpty()) {
+            if (StringUtils.isEmpty((String) getInputParameter(PROXY_PROTOCOL))) {
+                throw new ConnectorValidationException("proxyProtocol is required when proxyHost is set");
+            }
+            if (StringUtils.isEmpty((String) getInputParameter(PROXY_PORT))) {
+                throw new ConnectorValidationException("proxyPort is required when proxyHost is set");
+            }
+        }
     }
 
     @Override
     protected void executeBusinessLogic() throws ConnectorException {
-        configureProxy();
+        Source sourceResponse;
+        try {
+            // inside the try: configureProxy may fail after writing a first system property
+            configureProxy();
+            Dispatch<Source> dispatch = createDispatch();
+            configureCredentials(dispatch);
+            configureSoapAction(dispatch);
+            configureHeaders(dispatch);
 
-        Dispatch<Source> dispatch = createDispatch();
-        configureCredentials(dispatch);
-        configureSoapAction(dispatch);
-        configureHeaders(dispatch);
-
-        String sanitizedEnvelope = retrieveAndSanitizeEnvelope();
-        Source sourceResponse = invoke(dispatch, sanitizedEnvelope);
-
-        restoreConfiguration();
+            String sanitizedEnvelope = retrieveAndSanitizeEnvelope();
+            sourceResponse = invoke(dispatch, sanitizedEnvelope);
+        } finally {
+            // the proxy settings are JVM wide: restore them even when the call fails
+            restoreConfiguration();
+        }
 
         boolean buildResponseDocumentEnvelope = getAndLogOptionalBooleanParameter(BUILD_RESPONSE_DOCUMENT_ENVELOPE);
         boolean buildResponseDocumentBody = getAndLogOptionalBooleanParameter(BUILD_RESPONSE_DOCUMENT_BODY);
@@ -353,22 +366,45 @@ public class SecureWSConnector extends AbstractConnector {
     }
 
     private void restoreConfiguration() {
-        for (Entry<String, String> entry : saveProxyConfiguration.entrySet()) {
-            if (entry.getValue() != null) {
-                System.setProperty(entry.getKey(), entry.getValue());
-            } else {
-                System.clearProperty(entry.getKey());
-            }
+        if (saveProxyConfiguration.isEmpty()) {
+            // No proxy configured, nothing to restore. Writing system properties anyway would fail in a sandboxed
+            // runtime (e.g. the Bonita Docker image runs connectors under a security manager denying it).
+            return;
         }
-        Authenticator.setDefault(null);
+        try {
+            for (Entry<String, String> entry : saveProxyConfiguration.entrySet()) {
+                if (entry.getValue() != null) {
+                    System.setProperty(entry.getKey(), entry.getValue());
+                } else {
+                    System.clearProperty(entry.getKey());
+                }
+            }
+            Authenticator.setDefault(null);
+        } catch (SecurityException e) {
+            // the security manager also denied the configuration, so nothing was changed. Do not throw from the
+            // finally block: it would hide the ConnectorException explaining the failure
+            LOGGER.warning(() -> "Unable to restore the JVM proxy settings: " + e.getMessage());
+        }
     }
 
-    private void configureProxy() {
-        saveProxyConfiguration = saveProxyConfiguration();
+    private void configureProxy() throws ConnectorException {
+        saveProxyConfiguration = new HashMap<>();
         String host = (String) getInputParameter(PROXY_HOST);
         if (host == null || host.isEmpty()) {
             return;
         }
+        saveProxyConfiguration = saveProxyConfiguration();
+        try {
+            applyProxyConfiguration(host);
+        } catch (SecurityException e) {
+            throw new ConnectorException("The runtime does not allow connectors to change the JVM proxy settings "
+                    + "(security manager, e.g. ProGrade in the Bonita Docker image). Remove the proxy inputs and "
+                    + "set the proxy for the whole JVM instead (http(s).proxyHost/proxyPort in JAVA_OPTS), "
+                    + "or disable the security manager (PRO_GRADE=false in the Bonita Docker image).", e);
+        }
+    }
+
+    private void applyProxyConfiguration(String host) {
         LOGGER.info(() -> String.format(KEY_VALUE_PATTERN, PROXY_HOST, host));
         String protocol = (String) getAndLogInputParameter(PROXY_PROTOCOL);
         String port = (String) getAndLogInputParameter(PROXY_PORT);

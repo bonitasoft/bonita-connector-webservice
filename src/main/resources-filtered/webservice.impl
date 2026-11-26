@@ -8,7 +8,7 @@
     <definitionVersion>${webservice.def.version}</definitionVersion>
     <implementationClassname>${webservice.main-class}</implementationClassname>
     <hasSources>false</hasSources>
-    <description>SOAP implementation based on javax.xml.ws</description>
+    <description>SOAP implementation based on Jakarta XML Web Services 4 (Eclipse Metro)</description>
 
 <!-- retrieved from the pom.xml at build time -->
 ${connector-dependencies}

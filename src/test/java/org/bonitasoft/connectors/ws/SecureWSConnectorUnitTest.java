@@ -17,12 +17,19 @@
 package org.bonitasoft.connectors.ws;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.junit.Test;
+import org.bonitasoft.engine.connector.ConnectorException;
+import org.bonitasoft.engine.connector.ConnectorValidationException;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -81,6 +88,59 @@ public class SecureWSConnectorUnitTest {
 
         // then:
         assertThat(envelopeBodyContent.getLocalName()).as(envelopeBodyContent.getNodeName()).isEqualTo("realResponse");
+    }
+
+    @Test
+    void should_restore_the_proxy_system_properties_when_the_call_fails() throws Exception {
+        String proxyHostBefore = System.getProperty("http.proxyHost");
+        String proxyPortBefore = System.getProperty("http.proxyPort");
+        Map<String, Object> parameters = proxyParameters();
+        parameters.put("proxyPort", "1");
+        webservice.setInputParameters(parameters);
+        webservice.validateInputParameters();
+
+        assertThatThrownBy(webservice::execute).isInstanceOf(ConnectorException.class);
+
+        assertThat(System.getProperty("http.proxyHost")).isEqualTo(proxyHostBefore);
+        assertThat(System.getProperty("http.proxyPort")).isEqualTo(proxyPortBefore);
+    }
+
+    @Test
+    void should_restore_the_proxy_system_properties_when_the_proxy_configuration_fails() throws Exception {
+        String proxyHostBefore = System.getProperty("http.proxyHost");
+        // no proxyPort: configuring the proxy fails after writing http.proxyHost
+        // (execute() does not validate, as when a caller skips validateInputParameters)
+        webservice.setInputParameters(proxyParameters());
+
+        assertThatThrownBy(webservice::execute).isInstanceOf(NullPointerException.class);
+
+        assertThat(System.getProperty("http.proxyHost")).isEqualTo(proxyHostBefore);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "proxyProtocol", "proxyPort" })
+    void should_require_proxy_protocol_and_port_when_a_proxy_host_is_set(String missingInput) {
+        Map<String, Object> parameters = proxyParameters();
+        parameters.put("proxyPort", "3128");
+        parameters.remove(missingInput);
+        webservice.setInputParameters(parameters);
+
+        assertThatThrownBy(webservice::validateInputParameters)
+                .isInstanceOf(ConnectorValidationException.class)
+                .hasMessageContaining(missingInput);
+    }
+
+    private static Map<String, Object> proxyParameters() {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("serviceNS", "http://hello.ws.connectors.bonitasoft.org/");
+        parameters.put("serviceName", "HelloWorldImplService");
+        parameters.put("portName", "HelloWorldImplPort");
+        parameters.put("binding", "http://schemas.xmlsoap.org/wsdl/soap/http");
+        parameters.put("endpointAddress", "http://localhost:1/HelloWorld");
+        parameters.put("envelope", "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"><soapenv:Body/></soapenv:Envelope>");
+        parameters.put("proxyProtocol", "HTTP");
+        parameters.put("proxyHost", "localhost");
+        return parameters;
     }
 
     private Document buildXml(String xml) throws Exception {
