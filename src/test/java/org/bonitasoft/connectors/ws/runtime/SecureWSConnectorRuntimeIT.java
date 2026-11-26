@@ -19,12 +19,11 @@ package org.bonitasoft.connectors.ws.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
+
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -50,12 +49,12 @@ import org.w3c.dom.Document;
 /**
  * Deploys the connector archive produced by the build in a Bonita runtime (Docker image given by the
  * {@code bonita.image} system property) and calls the test SOAP server from a process.
- * {@code connector.zip} overrides the archive under test, e.g. to check a previous release.
+ * {@code connector.zip} is the archive under test (set by the build to the one it produced; override it to check
+ * another one, e.g. a previous release).
  */
 class SecureWSConnectorRuntimeIT {
 
     private static final int SOAP_PORT = 9002;
-    private static final String PROCESS_NAME = "WS_PROCESS";
 
     private static Server soapServer;
     private static BonitaContainer bonita;
@@ -81,23 +80,43 @@ class SecureWSConnectorRuntimeIT {
 
     @Test
     void should_call_a_soap_service_from_a_process() throws Exception {
-        bonita.installProcess(businessArchive());
-        long caseId = bonita.startProcess(PROCESS_NAME);
+        long caseId = deployAndStart("WS_PROCESS", Map.of());
 
-        // started: waiting on its user task; error: the connector failed
-        await().atMost(Duration.ofMinutes(2)).until(bonita.pollStateOf(caseId), state -> !"initializing".equals(state));
-        assertThat(bonita.pollStateOf(caseId).call()).as("process state (see the Bonita container logs on error)")
+        assertThat(finalStateOf(caseId)).as("process state (see the Bonita container logs on error)")
                 .isEqualTo("started");
         assertThat(bonita.getProcessVariableValue(caseId, "response")).isEqualTo("Hello Bonita 12");
     }
 
-    private BusinessArchive businessArchive() throws Exception {
+    @Test
+    void should_explain_why_a_proxy_cannot_be_set_under_a_security_manager() throws Exception {
+        assumeTrue("true".equals(bonita.execInContainer("sh", "-c", "printf %s \"$PRO_GRADE\"").getStdout()),
+                "the image does not run the ProGrade security manager");
+
+        long caseId = deployAndStart("WS_PROXY_PROCESS",
+                Map.of("proxyProtocol", "HTTP", "proxyHost", "proxy.invalid", "proxyPort", "3128"));
+
+        assertThat(finalStateOf(caseId)).isEqualTo("error");
+        assertThat(bonita.getLogs()).contains("does not allow connectors to change the JVM proxy settings");
+    }
+
+    private long deployAndStart(String processName, Map<String, String> extraInputs) throws Exception {
+        bonita.installProcess(businessArchive(processName, extraInputs));
+        return bonita.startProcess(processName);
+    }
+
+    /** started: waiting on its user task once the connector has run; error: the connector failed. */
+    private String finalStateOf(long caseId) throws Exception {
+        await().atMost(Duration.ofMinutes(2)).until(bonita.pollStateOf(caseId), state -> !"initializing".equals(state));
+        return bonita.pollStateOf(caseId).call();
+    }
+
+    private BusinessArchive businessArchive(String processName, Map<String, String> extraInputs) throws Exception {
         var exp = new ExpressionBuilder();
-        var process = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, "1.0");
+        var process = new ProcessDefinitionBuilder().createNewInstance(processName, "1.0");
         process.addActor("system");
         process.addData("response", String.class.getName(), null);
         var connector = process.addConnector("ws", "webservice", "1.1.0", ConnectorEvent.ON_ENTER);
-        Map.of("serviceNS", "http://hello.ws.connectors.bonitasoft.org/",
+        var inputs = new HashMap<>(Map.of("serviceNS", "http://hello.ws.connectors.bonitasoft.org/",
                 "serviceName", "HelloWorldImplService",
                 "portName", "HelloWorldImplPort",
                 "endpointAddress", "http://host.testcontainers.internal:" + SOAP_PORT + "/HelloWorld",
@@ -107,14 +126,15 @@ class SecureWSConnectorRuntimeIT {
                 "envelope", "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\""
                         + " xmlns:spr=\"http://hello.ws.connectors.bonitasoft.org/\">"
                         + "<soapenv:Body><spr:sayHi><arg0>Bonita 12</arg0></spr:sayHi></soapenv:Body>"
-                        + "</soapenv:Envelope>")
-                .forEach((name, value) -> {
-                    try {
-                        connector.addInput(name, exp.createConstantStringExpression(value));
-                    } catch (Exception e) {
-                        throw new IllegalStateException(e);
-                    }
-                });
+                        + "</soapenv:Envelope>"));
+        inputs.putAll(extraInputs);
+        inputs.forEach((name, value) -> {
+            try {
+                connector.addInput(name, exp.createConstantStringExpression(value));
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+        });
         connector.addInput("buildResponseDocumentBody", exp.createConstantBooleanExpression(true));
         connector.addOutput(new OperationBuilder().createSetDataOperation("response",
                 exp.createGroovyScriptExpression("bodyText", "responseDocumentBody.documentElement.textContent",
@@ -124,7 +144,7 @@ class SecureWSConnectorRuntimeIT {
         process.addUserTask("waiting task", "system");
 
         var bar = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process.done());
-        try (var zip = new ZipFile(connectorArchive().toFile())) {
+        try (var zip = new ZipFile(System.getProperty("connector.zip"))) {
             for (ZipEntry entry : zip.stream().filter(e -> !e.isDirectory()).toList()) {
                 var resource = new BarResource(Paths.get(entry.getName()).getFileName().toString(),
                         zip.getInputStream(entry).readAllBytes());
@@ -141,19 +161,5 @@ class SecureWSConnectorRuntimeIT {
         actorMapping.addActor(system);
         bar.setActorMapping(actorMapping);
         return bar.done();
-    }
-
-    private static Path connectorArchive() {
-        var override = System.getProperty("connector.zip");
-        if (override != null) {
-            return Paths.get(override);
-        }
-        try (var files = Files.list(Paths.get("target"))) {
-            return files.filter(f -> f.getFileName().toString().endsWith("-secured-webservice.zip"))
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalStateException("No connector archive in target/, run the package phase first"));
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
     }
 }

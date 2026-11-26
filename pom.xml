@@ -53,6 +53,8 @@
         <bonita-runtime.version>12.0-SNAPSHOT</bonita-runtime.version>
         <!-- Docker image the runtime ITs deploy the connector to. TODO Bonita 12.0 GA: switch to bonita:12.0.0 -->
         <bonita.image>bonitasoft.jfrog.io/docker-snapshots/bonita-community:12.0-SNAPSHOT</bonita.image>
+        <!-- Connector archive the runtime ITs deploy: the one of this build (-Dconnector.zip=... to check another one) -->
+        <connector.zip>${project.build.directory}/${project.build.finalName}-secured-webservice.zip</connector.zip>
 
         <!-- Test -->
         <cxf.version>4.1.9</cxf.version>
@@ -138,6 +140,10 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
             <version>${commons-text.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
         </dependency>
         <dependency>
             <groupId>jakarta.xml.ws</groupId>
@@ -419,6 +425,7 @@
                         <configuration>
                             <systemPropertyVariables>
                                 <bonita.image>${bonita.image}</bonita.image>
+                                <connector.zip>${connector.zip}</connector.zip>
                             </systemPropertyVariables>
                         </configuration>
                     </execution>

@@ -225,9 +225,11 @@ public class SecureWSConnectorTest {
                 " </soapenv:Body>" +
                 "</soapenv:Envelope>";
 
-        assertThrows(ConnectorException.class, () -> execute(request, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloHeader",
+        ConnectorException exception = assertThrows(ConnectorException.class, () -> execute(request, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9002/HelloHeader",
                 "HelloHeaderImplService", "HelloWorldImplPort",
                 "http://hello.cxf.ws.connectors.bonitasoft.org/", null, "guest", "guest", requestHeaders));
+        // the SOAP fault raised by the server on the wrong header, not any other failure
+        assertThat(exception.getCause()).hasMessageContaining("TestName value is not equals to testValue: testValue2");
     }
 
     @Test

@@ -371,23 +371,40 @@ public class SecureWSConnector extends AbstractConnector {
             // runtime (e.g. the Bonita Docker image runs connectors under a security manager denying it).
             return;
         }
-        for (Entry<String, String> entry : saveProxyConfiguration.entrySet()) {
-            if (entry.getValue() != null) {
-                System.setProperty(entry.getKey(), entry.getValue());
-            } else {
-                System.clearProperty(entry.getKey());
+        try {
+            for (Entry<String, String> entry : saveProxyConfiguration.entrySet()) {
+                if (entry.getValue() != null) {
+                    System.setProperty(entry.getKey(), entry.getValue());
+                } else {
+                    System.clearProperty(entry.getKey());
+                }
             }
+            Authenticator.setDefault(null);
+        } catch (SecurityException e) {
+            // the security manager also denied the configuration, so nothing was changed. Do not throw from the
+            // finally block: it would hide the ConnectorException explaining the failure
+            LOGGER.warning(() -> "Unable to restore the JVM proxy settings: " + e.getMessage());
         }
-        Authenticator.setDefault(null);
     }
 
-    private void configureProxy() {
+    private void configureProxy() throws ConnectorException {
         saveProxyConfiguration = new HashMap<>();
         String host = (String) getInputParameter(PROXY_HOST);
         if (host == null || host.isEmpty()) {
             return;
         }
         saveProxyConfiguration = saveProxyConfiguration();
+        try {
+            applyProxyConfiguration(host);
+        } catch (SecurityException e) {
+            throw new ConnectorException("The runtime does not allow connectors to change the JVM proxy settings "
+                    + "(security manager, e.g. ProGrade in the Bonita Docker image). Remove the proxy inputs and "
+                    + "set the proxy for the whole JVM instead (http(s).proxyHost/proxyPort in JAVA_OPTS), "
+                    + "or disable the security manager (PRO_GRADE=false in the Bonita Docker image).", e);
+        }
+    }
+
+    private void applyProxyConfiguration(String host) {
         LOGGER.info(() -> String.format(KEY_VALUE_PATTERN, PROXY_HOST, host));
         String protocol = (String) getAndLogInputParameter(PROXY_PROTOCOL);
         String port = (String) getAndLogInputParameter(PROXY_PORT);

@@ -5,8 +5,9 @@
 The Bonita Webservice Connector enables Bonita BPM processes to invoke SOAP web services with Jakarta XML Web Services 4 (Eclipse Metro `jaxws-rt`, bundled). Version 2.x targets Bonita 12+ / Java 17; Bonita 8.0 - 11.x use the 1.x versions. It is packaged as a Bonita connector artifact (`.zip` + `.jar`) and deployed into the Bonita Engine runtime.
 
 - **Artifact:** `org.bonitasoft.connectors:bonita-connector-webservice`
-- **Current version:** `1.3.6-SNAPSHOT`
-- **Java:** 11 (compiled), 17 (CI build)
+- **Current version:** `2.0.0-SNAPSHOT`
+- **Java:** 17
+- **Bonita runtime:** 12.0+ (1.x line for 8.0 - 11.x)
 - **License:** GPL-2.0
 - **Main class:** `org.bonitasoft.connectors.ws.SecureWSConnector`
 
@@ -34,7 +35,7 @@ The Bonita Webservice Connector enables Bonita BPM processes to invoke SOAP web 
 
 The build produces:
 - `target/bonita-connector-webservice-<version>.jar` — connector classes
-- `target/bonita-connector-webservice-<version>-webservice.zip` — connector package for Bonita Studio/Engine
+- `target/bonita-connector-webservice-<version>-secured-webservice.zip` — connector package for Bonita Studio/Engine (`.impl` + `classpath/`)
 - `target/bonita-connector-webservice-<version>-all.zip` — all-dependencies assembly
 
 ## Architecture
@@ -141,7 +142,7 @@ ci: add Claude Code review workflow
 Releases are triggered manually via the **Release** GitHub Actions workflow (`release.yml`):
 
 1. Go to **Actions → Release → Run workflow**.
-2. Enter the release version (e.g., `1.3.6`).
+2. Enter the release version (e.g., `2.0.0`).
 3. The reusable workflow `bonitasoft/github-workflows/.github/workflows/_reusable_release_connector.yml` handles:
    - Version bump in `pom.xml`
    - Git tag creation

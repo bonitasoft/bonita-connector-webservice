@@ -14,7 +14,8 @@ it# Webservice Connector
 | 1.x (up to 1.3.5)   | 8.0 to 11.x    | 11 and later  | JAX-WS 2.3 (`javax.xml.ws`)                  |
 
 The connector definition (`webservice` 1.1.0) and its inputs/outputs are unchanged: on Bonita 12, processes using a
-1.x implementation must switch to a 2.x implementation.
+1.x implementation must switch to a 2.x implementation. A 1.x implementation fails on Bonita 12 with
+`ClassNotFoundException: javax.xml.bind.JAXBException` (it relied on the `javax` JAXB the runtime no longer provides).
 
 The proxy inputs are applied through JVM system properties: in a runtime that denies connectors the right to write
 them (the Bonita 12 Docker image runs a ProGrade security manager, `PRO_GRADE=true`), a connector configured with a
