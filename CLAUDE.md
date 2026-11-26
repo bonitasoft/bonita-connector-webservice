@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-The Bonita Webservice Connector enables Bonita BPM processes to invoke SOAP/JAX-WS web services. It is packaged as a Bonita connector artifact (`.zip` + `.jar`) and deployed into the Bonita Engine runtime.
+The Bonita Webservice Connector enables Bonita BPM processes to invoke SOAP web services with Jakarta XML Web Services 4 (Eclipse Metro `jaxws-rt`, bundled). Version 2.x targets Bonita 12+ / Java 17; Bonita 8.0 - 11.x use the 1.x versions. It is packaged as a Bonita connector artifact (`.zip` + `.jar`) and deployed into the Bonita Engine runtime.
 
 - **Artifact:** `org.bonitasoft.connectors:bonita-connector-webservice`
 - **Current version:** `1.3.6-SNAPSHOT`
@@ -59,10 +59,11 @@ src/
     header.txt                        # GPL license header checked on every .java file
   test/
     java/org/bonitasoft/connectors/ws/
-      SecureWSConnectorTest.java      # integration tests (start real Jetty+CXF server)
+      SecureWSConnectorTest.java      # integration tests (start real Jetty 12 + CXF 4 server)
       SecureWSConnectorUnitTest.java  # unit tests (no server)
       Server.java / ServerThread.java # embedded test server helpers
       hello/ helloHeader/ helloTimeout/ customer/  # test web service implementations
+      runtime/SecureWSConnectorRuntimeIT.java     # deploys the built zip in a Bonita Docker image (Testcontainers)
 ```
 
 ### Key design points
@@ -70,7 +71,7 @@ src/
 - `SecureWSConnector` extends `AbstractConnector` from `bonita-common`.
 - Uses JAX-WS `Dispatch<Source>` in `Service.Mode.MESSAGE` — sends the raw SOAP envelope string as-is.
 - Supports SOAP 1.1 and 1.2 (binding string controls this).
-- Proxy configuration (HTTP/HTTPS/SOCKS) is applied to JVM system properties before invocation and restored afterwards.
+- Proxy configuration (HTTP/HTTPS/SOCKS) is applied to JVM system properties before invocation and restored afterwards (in a `finally`). System properties are only touched when a proxy is configured: sandboxed runtimes (the Bonita 12 Docker image runs a ProGrade security manager) deny connectors the right to write them.
 - Invalid XML 1.0 control characters are stripped from the envelope before dispatch.
 - Three outputs: `sourceResponse` (`javax.xml.transform.Source`), `responseDocumentEnvelope` (`org.w3c.dom.Document`), `responseDocumentBody` (`org.w3c.dom.Document`).
 
@@ -91,7 +92,7 @@ src/
 
 ## Testing
 
-Tests use JUnit 4, AssertJ, and an embedded Apache CXF + Jetty server started on port 9002.
+Tests use JUnit 6 (Jupiter), AssertJ, and an embedded Apache CXF 4 + Jetty 12 (ee10) server started on port 9002. `SecureWSConnectorRuntimeIT` (failsafe, `./mvnw verify`, needs Docker) deploys the built connector zip in the image given by `bonita.image` and calls that server from a process.
 
 ```bash
 # Run all tests
@@ -105,7 +106,7 @@ Tests use JUnit 4, AssertJ, and an embedded Apache CXF + Jetty server started on
 ```
 
 - `SecureWSConnectorUnitTest` — pure unit tests; no network, tests XML parsing helpers.
-- `SecureWSConnectorTest` — integration tests; `@BeforeClass` starts the embedded CXF/Jetty server; tests cover basic auth, HTTP headers, timeouts, envelope sanitisation, one-way invocation.
+- `SecureWSConnectorTest` — integration tests; `@BeforeAll` starts the embedded CXF/Jetty server; tests cover basic auth, HTTP headers, timeouts, envelope sanitisation, one-way invocation.
 
 When writing new tests:
 - Prefer `SecureWSConnectorUnitTest` for logic that does not require a live server.

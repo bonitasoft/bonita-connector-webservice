@@ -17,7 +17,7 @@
 // START SNIPPET: service
 package org.bonitasoft.connectors.ws.helloTimeout;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService
 public interface HelloTimeout {

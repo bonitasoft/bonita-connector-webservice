@@ -22,12 +22,9 @@ import java.net.URL;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 
+import org.eclipse.jetty.ee10.webapp.WebAppContext;
 import org.eclipse.jetty.security.HashLoginService;
-import org.eclipse.jetty.security.LoginService;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.util.resource.ResourceFactory;
 
 public class Server {
 
@@ -46,18 +43,15 @@ public class Server {
 
         final WebAppContext webappcontext = new WebAppContext();
         webappcontext.setContextPath("/");
-
         webappcontext.setWar("src/test/resources/webapp");
-
-        final HandlerCollection handlers = new HandlerCollection();
-        handlers.setHandlers(new Handler[] { webappcontext, new DefaultHandler() });
-
-        server.setHandler(handlers);
+        // the webapp has no WEB-INF/lib: CXF and Spring come from the test classpath
+        webappcontext.setParentLoaderPriority(true);
+        server.setHandler(webappcontext);
 
         URL realmProps = Server.class.getResource("/org/bonitasoft/connectors/ws/realm.properties");
         if (realmProps == null)
             throw new FileNotFoundException("Unable to find realm.properties");
-        LoginService loginService = new HashLoginService("MyRealm", realmProps.toExternalForm());
+        HashLoginService loginService = new HashLoginService("MyRealm", ResourceFactory.of(server).newResource(realmProps));
         server.addBean(loginService);
 
         thread = new ServerThread(server);

@@ -6,6 +6,20 @@ it# Webservice Connector
 [![Maven Central](https://img.shields.io/maven-central/v/org.bonitasoft.connectors/bonita-connector-webservice.svg?label=Maven%20Central&color=orange)](https://search.maven.org/search?q=g:%22org.bonitasoft.connectors%22%20AND%20a:%22bonita-connector-webservice%22)
 [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-yellow.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
 
+## Compatibility
+
+| Connector           | Bonita         | Java          | SOAP stack                                   |
+|---------------------|----------------|---------------|----------------------------------------------|
+| 2.x (`master`)      | 12.0 and later | 17 and later  | Jakarta XML Web Services 4 (`jaxws-rt` 4.0)  |
+| 1.x (up to 1.3.5)   | 8.0 to 11.x    | 11 and later  | JAX-WS 2.3 (`javax.xml.ws`)                  |
+
+The connector definition (`webservice` 1.1.0) and its inputs/outputs are unchanged: on Bonita 12, processes using a
+1.x implementation must switch to a 2.x implementation.
+
+The proxy inputs are applied through JVM system properties: in a runtime that denies connectors the right to write
+them (the Bonita 12 Docker image runs a ProGrade security manager, `PRO_GRADE=true`), a connector configured with a
+proxy fails. Without proxy, the connector does not touch system properties.
+
 ## Build
 
 __Clone__ or __fork__ this repository, then at the root of the project run:

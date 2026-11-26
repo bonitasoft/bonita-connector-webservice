@@ -17,7 +17,7 @@
 package org.bonitasoft.connectors.ws.helloTimeout;
 
 import java.util.logging.Logger;
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService(endpointInterface = "org.bonitasoft.connectors.ws.helloTimeout.HelloTimeout")
 public class HelloTimeoutImpl implements HelloTimeout {

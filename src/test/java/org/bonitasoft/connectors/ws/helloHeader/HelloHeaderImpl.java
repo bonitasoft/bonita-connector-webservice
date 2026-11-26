@@ -18,7 +18,7 @@
 package org.bonitasoft.connectors.ws.helloHeader;
 
 import java.util.logging.Logger;
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @org.apache.cxf.interceptor.InInterceptors(interceptors = { "org.bonitasoft.connectors.ws.helloHeader.HttpHeaderInInterceptor" })
 @WebService(endpointInterface = "org.bonitasoft.connectors.ws.helloHeader.HelloHeader")

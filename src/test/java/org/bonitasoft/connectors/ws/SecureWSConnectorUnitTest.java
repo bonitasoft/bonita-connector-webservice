@@ -17,12 +17,16 @@
 package org.bonitasoft.connectors.ws;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.junit.Test;
+import org.bonitasoft.engine.connector.ConnectorException;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -81,6 +85,27 @@ public class SecureWSConnectorUnitTest {
 
         // then:
         assertThat(envelopeBodyContent.getLocalName()).as(envelopeBodyContent.getNodeName()).isEqualTo("realResponse");
+    }
+
+    @Test
+    void should_restore_the_proxy_system_properties_when_the_call_fails() throws Exception {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("serviceNS", "http://hello.ws.connectors.bonitasoft.org/");
+        parameters.put("serviceName", "HelloWorldImplService");
+        parameters.put("portName", "HelloWorldImplPort");
+        parameters.put("binding", "http://schemas.xmlsoap.org/wsdl/soap/http");
+        parameters.put("endpointAddress", "http://localhost:1/HelloWorld");
+        parameters.put("envelope", "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"><soapenv:Body/></soapenv:Envelope>");
+        parameters.put("proxyProtocol", "HTTP");
+        parameters.put("proxyHost", "localhost");
+        parameters.put("proxyPort", "1");
+        webservice.setInputParameters(parameters);
+        webservice.validateInputParameters();
+
+        assertThatThrownBy(webservice::execute).isInstanceOf(ConnectorException.class);
+
+        assertThat(System.getProperty("http.proxyHost")).isNull();
+        assertThat(System.getProperty("http.proxyPort")).isNull();
     }
 
     private Document buildXml(String xml) throws Exception {

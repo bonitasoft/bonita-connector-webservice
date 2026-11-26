@@ -18,7 +18,7 @@
 package org.bonitasoft.connectors.ws.hello;
 
 import java.util.logging.Logger;
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService(endpointInterface = "org.bonitasoft.connectors.ws.hello.HelloWorld")
 public class HelloWorldImpl implements HelloWorld {
